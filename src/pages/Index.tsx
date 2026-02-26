@@ -13,11 +13,11 @@ const teams = [
     winrate: 81,
     change: 0,
     players: [
-      { name: "s1mple_jr", role: "Снайпер", rating: 1.38 },
-      { name: "NightHawk", role: "Рифлер", rating: 1.22 },
-      { name: "ZeroTwo", role: "Капитан", rating: 1.18 },
-      { name: "Vortex", role: "Рифлер", rating: 1.14 },
-      { name: "Pulse", role: "Поддержка", rating: 1.09 },
+      { name: "rrubbi", role: "AWP", rating: 1.28 },
+      { name: "TheHail", role: "LURKER", rating: 1.31 },
+      { name: "Flintyyy", role: "RIFLER", rating: 1.28 },
+      { name: "Orehhh", role: "IGL", rating: 1.01 },
+      { name: "Sains_s", role: "RIFLER", rating: 1.29 },
     ],
   },
   {
