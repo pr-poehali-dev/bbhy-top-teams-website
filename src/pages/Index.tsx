@@ -345,13 +345,13 @@ export default function Index() {
         {activeTab === "ranking" && (
           <div className="space-y-1">
             {/* Заголовок таблицы */}
-            <div className="grid grid-cols-[52px_1fr_80px_80px_80px_90px] gap-4 px-4 py-2 text-[10px] text-[#ffffff30] tracking-[0.2em] uppercase font-oswald">
+            <div className="grid grid-cols-[40px_1fr_70px_24px] sm:grid-cols-[52px_1fr_80px_80px_80px_90px] gap-2 sm:gap-4 px-4 py-2 text-[10px] text-[#ffffff30] tracking-[0.2em] uppercase font-oswald">
               <span>#</span>
               <span>Команда</span>
               <span className="text-right">Очки</span>
               <span className="text-right hidden sm:block">В/П</span>
               <span className="text-right hidden sm:block">Winrate</span>
-              <span className="text-right">Состав</span>
+              <span className="text-right"></span>
             </div>
 
             {teams.map((team, i) => {
@@ -366,7 +366,7 @@ export default function Index() {
                 >
                   <div
                     onClick={() => setExpandedTeam(isExpanded ? null : team.rank)}
-                    className={`grid grid-cols-[52px_1fr_80px_80px_80px_90px] gap-4 px-4 py-4 cursor-pointer transition-all duration-200 border border-transparent group
+                    className={`grid grid-cols-[40px_1fr_70px_24px] sm:grid-cols-[52px_1fr_80px_80px_80px_90px] gap-2 sm:gap-4 px-4 py-4 cursor-pointer transition-all duration-200 border border-transparent group
                       ${isTop3
                         ? "bg-[#0aff88]/5 hover:bg-[#0aff88]/10 hover:border-[#0aff88]/20"
                         : "bg-[#ffffff04] hover:bg-[#ffffff07] hover:border-[#ffffff10]"
@@ -388,14 +388,10 @@ export default function Index() {
                     </div>
 
                     {/* Название */}
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="min-w-0">
-                        <div className={`font-oswald font-semibold text-sm tracking-wide truncate ${isTop3 ? "text-white" : "text-[#ffffffcc]"}`}>
-                          {team.name}
-                        </div>
-
+                    <div className="flex items-center min-w-0">
+                      <div className={`font-oswald font-semibold text-sm tracking-wide truncate ${isTop3 ? "text-white" : "text-[#ffffffcc]"}`}>
+                        {team.name}
                       </div>
-
                     </div>
 
                     {/* Очки */}
