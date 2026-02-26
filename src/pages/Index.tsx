@@ -393,7 +393,7 @@ export default function Index() {
                         <div className={`font-oswald font-semibold text-sm tracking-wide truncate ${isTop3 ? "text-white" : "text-[#ffffffcc]"}`}>
                           {team.name}
                         </div>
-                        <div className="text-[10px] text-[#ffffff40] tracking-widest">[{team.tag}]</div>
+
                       </div>
                       {team.change !== 0 && (
                         <span className={`text-[10px] font-bold ${team.change > 0 ? "text-[#0aff88]" : "text-[#ff4466]"}`}>
@@ -494,7 +494,7 @@ export default function Index() {
                   </div>
 
                   <div className="flex items-center gap-1 min-w-0">
-                    <span className="text-[10px] text-[#ffffff50] font-oswald truncate">[{player.tag}]</span>
+                    <span className="text-[10px] text-[#ffffff50] font-oswald truncate">{player.team}</span>
                   </div>
 
                   <div className="hidden sm:flex items-center justify-end">
