@@ -395,11 +395,7 @@ export default function Index() {
                         </div>
 
                       </div>
-                      {team.change !== 0 && (
-                        <span className={`text-[10px] font-bold ${team.change > 0 ? "text-[#0aff88]" : "text-[#ff4466]"}`}>
-                          {team.change > 0 ? `▲${team.change}` : `▼${Math.abs(team.change)}`}
-                        </span>
-                      )}
+
                     </div>
 
                     {/* Очки */}
