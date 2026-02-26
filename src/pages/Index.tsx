@@ -13,11 +13,11 @@ const teams = [
     winrate: 81,
     change: 0,
     players: [
-      { name: "rrubbi", role: "AWP", rating: 1.28 },
-      { name: "TheHail", role: "LURKER", rating: 1.31 },
-      { name: "Flintyyy", role: "RIFLER", rating: 1.28 },
+      { name: "rrubbi", role: "AWP", rating: 1.29 },
+      { name: "TheHail", role: "LURKER", rating: 1.35 },
+      { name: "Flintyyy", role: "RIFLER", rating: 1.32 },
       { name: "Orehhh", role: "IGL", rating: 1.01 },
-      { name: "Sains_s", role: "RIFLER", rating: 1.29 },
+      { name: "Sains_s", role: "RIFLER", rating: 1.26 },
     ],
   },
   {
