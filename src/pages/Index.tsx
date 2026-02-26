@@ -281,7 +281,7 @@ export default function Index() {
   const [expandedTeam, setExpandedTeam] = useState<number | null>(null);
 
   const allPlayers = teams.flatMap((t) =>
-    t.players.map((p) => ({ ...p, team: t.name, tag: t.tag, country: t.country }))
+    t.players.map((p) => ({ ...p, team: t.name, tag: t.tag }))
   ).sort((a, b) => b.rating - a.rating);
 
   return (
@@ -389,7 +389,6 @@ export default function Index() {
 
                     {/* Название */}
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className="text-xs">{team.country}</span>
                       <div className="min-w-0">
                         <div className={`font-oswald font-semibold text-sm tracking-wide truncate ${isTop3 ? "text-white" : "text-[#ffffffcc]"}`}>
                           {team.name}
@@ -495,7 +494,6 @@ export default function Index() {
                   </div>
 
                   <div className="flex items-center gap-1 min-w-0">
-                    <span className="text-xs">{player.country}</span>
                     <span className="text-[10px] text-[#ffffff50] font-oswald truncate">[{player.tag}]</span>
                   </div>
 
