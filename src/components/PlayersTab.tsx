@@ -1,10 +1,13 @@
+import { useNavigate } from "react-router-dom";
 import { teams } from "@/data/teams";
 
 const allPlayers = teams
-  .flatMap((t) => t.players.map((p) => ({ ...p, team: t.name, tag: t.tag })))
+  .flatMap((t) => t.players.map((p) => ({ ...p, team: t.name, tag: t.tag, teamSlug: t.name.toLowerCase().replace(/\s+/g, "-") })))
   .sort((a, b) => b.rating - a.rating);
 
 export default function PlayersTab() {
+  const navigate = useNavigate();
+
   return (
     <div>
       <div className="grid grid-cols-[32px_1fr_100px_80px_80px] gap-4 px-4 py-2 text-[10px] text-[#ffffff30] tracking-[0.2em] uppercase font-oswald mb-1">
@@ -19,7 +22,8 @@ export default function PlayersTab() {
         {allPlayers.map((player, i) => (
           <div
             key={i}
-            className="grid grid-cols-[32px_1fr_100px_80px_80px] gap-4 px-4 py-3 bg-[#ffffff04] border border-transparent hover:bg-[#0aff88]/5 hover:border-[#0aff88]/20 transition-all duration-150 animate-fade-in"
+            onClick={() => navigate(`/player/${player.teamSlug}/${player.name.toLowerCase()}`)}
+            className="grid grid-cols-[32px_1fr_100px_80px_80px] gap-4 px-4 py-3 bg-[#ffffff04] border border-transparent hover:bg-[#0aff88]/5 hover:border-[#0aff88]/20 transition-all duration-150 animate-fade-in cursor-pointer"
             style={{ animationDelay: `${i * 20}ms` }}
           >
             <div className="flex items-center">
@@ -30,7 +34,7 @@ export default function PlayersTab() {
               <div className="w-6 h-6 bg-[#0aff88]/10 border border-[#0aff88]/20 flex items-center justify-center flex-shrink-0">
                 <span className="text-[8px] text-[#0aff88] font-oswald font-bold">{player.name.slice(0, 2).toUpperCase()}</span>
               </div>
-              <span className="font-oswald text-sm text-white truncate">{player.name}</span>
+              <span className="font-oswald text-sm text-white truncate hover:text-[#0aff88] transition-colors">{player.name}</span>
             </div>
 
             <div className="flex items-center gap-1 min-w-0">
