@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Icon from "@/components/ui/icon";
 import { teams } from "@/data/teams";
 
 const allPlayers = teams
@@ -7,9 +9,34 @@ const allPlayers = teams
 
 export default function PlayersTab() {
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+
+  const filtered = search.trim()
+    ? allPlayers.filter(p =>
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        p.team.toLowerCase().includes(search.toLowerCase())
+      )
+    : allPlayers;
 
   return (
     <div>
+      {/* Поиск */}
+      <div className="relative mb-4">
+        <Icon name="Search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ffffff30]" />
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Поиск по нику или команде..."
+          className="w-full bg-[#ffffff04] border border-[#ffffff10] focus:border-[#0aff88]/40 outline-none px-4 py-2.5 pl-9 text-sm text-white placeholder-[#ffffff30] font-oswald tracking-wide transition-colors"
+        />
+        {search && (
+          <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#ffffff30] hover:text-white transition-colors">
+            <Icon name="X" size={13} />
+          </button>
+        )}
+      </div>
+
       <div className="grid grid-cols-[32px_1fr_100px_80px_80px] gap-4 px-4 py-2 text-[10px] text-[#ffffff30] tracking-[0.2em] uppercase font-oswald mb-1">
         <span>#</span>
         <span>Игрок</span>
@@ -19,7 +46,14 @@ export default function PlayersTab() {
       </div>
 
       <div className="space-y-1">
-        {allPlayers.map((player, i) => (
+        {filtered.length === 0 && (
+          <div className="text-center py-10 text-[#ffffff30] font-oswald tracking-widest uppercase text-sm">
+            Игроки не найдены
+          </div>
+        )}
+        {filtered.map((player, i) => {
+          const globalRank = allPlayers.indexOf(player) + 1;
+          return (
           <div
             key={i}
             onClick={() => navigate(`/player/${player.teamSlug}/${player.name.toLowerCase()}`)}
@@ -27,7 +61,7 @@ export default function PlayersTab() {
             style={{ animationDelay: `${i * 20}ms` }}
           >
             <div className="flex items-center">
-              <span className={`font-oswald text-sm w-6 text-center ${i < 3 ? "text-[#0aff88] font-bold" : "text-[#ffffff40]"}`}>{i + 1}</span>
+              <span className={`font-oswald text-sm w-6 text-center ${globalRank <= 3 ? "text-[#0aff88] font-bold" : "text-[#ffffff40]"}`}>{globalRank}</span>
             </div>
 
             <div className="flex items-center gap-2 min-w-0">
@@ -55,7 +89,8 @@ export default function PlayersTab() {
               </span>
             </div>
           </div>
-        ))}
+        );
+        })}
       </div>
     </div>
   );
