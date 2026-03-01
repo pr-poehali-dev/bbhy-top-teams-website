@@ -6,7 +6,6 @@ import Icon from "@/components/ui/icon";
 const W_CUP_TROPHY = "https://cdn.poehali.dev/projects/7cb67d80-2ffe-43b4-9ac6-5580ad747c34/files/9233dabc-c1b6-424e-90c8-0e2626df8046.jpg";
 const MVP_MEDAL   = "https://cdn.poehali.dev/projects/7cb67d80-2ffe-43b4-9ac6-5580ad747c34/files/2baf38e5-0fb6-4171-94e3-29e66dfeb889.jpg";
 
-// Трофеи: ключ — никнейм (lowercase)
 const TROPHIES: Record<string, { img: string; label: string }[]> = {
   rrubbi:    [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
   thehail:   [{ img: W_CUP_TROPHY, label: "W Cup 2026" }, { img: MVP_MEDAL, label: "MVP W Cup" }],
@@ -28,8 +27,10 @@ function getRatingLabel(r: number) {
   return "НИЗКИЙ";
 }
 
+// Firepower: поднят на 15 пунктов для всех
 function getFirepower(r: number): { score: number; grade: string; color: string } {
-  const score = Math.round(Math.min(r / 2.0, 1) * 100);
+  const raw = Math.round(Math.min(r / 2.0, 1) * 100);
+  const score = Math.min(raw + 15, 100);
   let grade = "C";
   let color = "#ff4466";
   if (r >= 1.4) { grade = "S+"; color = "#0aff88"; }
@@ -54,7 +55,7 @@ function deriveStats(name: string, rating: number) {
   return {
     rating,
     kd:   parseFloat((rating * 0.96 + seededRandom(name, 1) * 0.08).toFixed(2)),
-    adr:  parseFloat((rating * 70 + seededRandom(name, 2) * 12).toFixed(1)),
+    adr:  parseFloat((rating * 85 + seededRandom(name, 2) * 15).toFixed(1)),
     hs:   parseFloat((26 + rating * 16 + seededRandom(name, 3) * 10).toFixed(1)),
     kast: parseFloat((52 + rating * 22 + seededRandom(name, 4) * 6).toFixed(1)),
   };
@@ -68,6 +69,8 @@ const TEAM_MATCHES: Record<string, { won: boolean; opponent: string; scoreA: num
 export default function PlayerPage() {
   const { teamSlug, playerName } = useParams<{ teamSlug: string; playerName: string }>();
   const navigate = useNavigate();
+  const [statsOpen, setStatsOpen] = useState(false);
+
   const team = teams.find(t => t.name.toLowerCase().replace(/\s+/g, "-") === teamSlug);
   const player = team?.players.find(p => p.name.toLowerCase() === playerName?.toLowerCase());
 
@@ -85,9 +88,11 @@ export default function PlayerPage() {
     );
   }
 
+  const stats = deriveStats(player.name, player.rating);
   const teamMatches = TEAM_MATCHES[team.name.toLowerCase()] ?? [];
   const ratingColor = getRatingColor(player.rating);
   const ratingLabel = getRatingLabel(player.rating);
+  const ratingPct = Math.min((player.rating / 2.0) * 100, 100);
   const fp = getFirepower(player.rating);
   const trophies = TROPHIES[player.name.toLowerCase()] ?? [];
 
@@ -152,12 +157,10 @@ export default function PlayerPage() {
                 </span>
                 <span className="text-[#ffffff40] text-xs">{team.country} {team.name}</span>
               </div>
-
-              {/* Трофеи */}
               {trophies.length > 0 && (
                 <div className="mt-4 flex items-center gap-3 flex-wrap">
                   {trophies.map((t, i) => (
-                    <div key={i} className="flex items-center gap-2 bg-[#ffffff06] border border-[#ffffff10] px-3 py-1.5 group relative">
+                    <div key={i} className="flex items-center gap-2 bg-[#ffffff06] border border-[#ffffff10] px-3 py-1.5">
                       <img src={t.img} alt={t.label} className="w-6 h-6 object-cover rounded-sm" />
                       <span className="font-oswald text-[11px] text-[#ffffff70] tracking-widest uppercase">{t.label}</span>
                     </div>
@@ -174,8 +177,8 @@ export default function PlayerPage() {
           </div>
         </div>
 
+        {/* Firepower + статы */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          {/* Firepower */}
           <div className="sm:col-span-1 bg-[#ffffff04] border border-[#ffffff08] p-5 animate-fade-in flex flex-col justify-between" style={{ animationDelay: "60ms" }}>
             <div className="flex items-center justify-between mb-4">
               <div className="text-[10px] text-[#0aff88]/60 tracking-[0.4em] uppercase font-oswald">Firepower</div>
@@ -188,12 +191,8 @@ export default function PlayerPage() {
               </div>
               <div className="font-oswald font-bold text-3xl" style={{ color: fp.color + "80" }}>{fp.grade}</div>
             </div>
-            {/* Прогресс-бар firepower */}
             <div className="h-2 bg-[#ffffff08] overflow-hidden relative">
-              <div
-                className="h-full transition-all duration-700"
-                style={{ width: `${fp.score}%`, backgroundColor: fp.color }}
-              />
+              <div className="h-full transition-all duration-700" style={{ width: `${fp.score}%`, backgroundColor: fp.color }} />
             </div>
             <div className="flex justify-between mt-1">
               <span className="text-[10px] text-[#ffffff20]">0</span>
@@ -202,18 +201,74 @@ export default function PlayerPage() {
             </div>
           </div>
 
-          {/* Заглушка статов */}
-          <div className="sm:col-span-2 flex items-center justify-center bg-[#ffffff04] border border-[#ffffff08] animate-fade-in" style={{ animationDelay: "80ms" }}>
-            <div className="text-center py-8 px-4">
-              <Icon name="Clock" size={28} className="text-[#ffffff20] mx-auto mb-3" />
-              <div className="font-oswald text-sm text-[#ffffff30] tracking-widest uppercase">Статистика скоро</div>
-              <div className="text-[11px] text-[#ffffff20] mt-1">Данные будут добавлены позже</div>
-            </div>
+          <div className="sm:col-span-2 grid grid-cols-2 gap-3 animate-fade-in" style={{ animationDelay: "80ms" }}>
+            {[
+              { label: "K/D Ratio", value: stats.kd.toFixed(2), color: getRatingColor(stats.kd) },
+              { label: "ADR",       value: stats.adr.toFixed(1), color: "#7c6af7" },
+              { label: "HS%",       value: stats.hs.toFixed(1) + "%", color: "#ff6b35" },
+              { label: "KAST%",     value: stats.kast.toFixed(1) + "%", color: "#00c8ff" },
+            ].map(({ label, value, color }) => (
+              <div key={label} className="bg-[#ffffff04] border border-[#ffffff08] p-4">
+                <div className="text-[10px] text-[#ffffff40] font-oswald tracking-widest uppercase mb-1">{label}</div>
+                <div className="font-oswald font-bold text-2xl" style={{ color }}>{value}</div>
+              </div>
+            ))}
           </div>
         </div>
 
+        {/* Детальная статистика — раскрывалка */}
+        <div className="mb-6 animate-fade-in" style={{ animationDelay: "110ms" }}>
+          <button
+            onClick={() => setStatsOpen(v => !v)}
+            className="w-full flex items-center justify-between px-5 py-3 bg-[#ffffff04] border border-[#ffffff08] hover:border-[#0aff88]/30 hover:bg-[#0aff88]/5 transition-all duration-200 group"
+          >
+            <span className="text-[10px] text-[#ffffff50] group-hover:text-[#0aff88] tracking-[0.4em] uppercase font-oswald transition-colors">
+              Детальная статистика
+            </span>
+            <Icon name={statsOpen ? "ChevronUp" : "ChevronDown"} size={14} className="text-[#ffffff30] group-hover:text-[#0aff88] transition-colors" />
+          </button>
+
+          {statsOpen && (
+            <div className="bg-[#ffffff04] border border-t-0 border-[#ffffff08] p-6 space-y-5">
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs text-[#ffffff60] font-oswald tracking-widest uppercase">Рейтинг 2.0</span>
+                  <span className="font-oswald font-bold text-sm" style={{ color: ratingColor }}>{player.rating.toFixed(2)}</span>
+                </div>
+                <div className="h-2 bg-[#ffffff08] overflow-hidden relative">
+                  <div className="h-full transition-all duration-700" style={{ width: `${ratingPct}%`, backgroundColor: ratingColor }} />
+                  {[0.5, 1.0, 1.5].map(mark => (
+                    <div key={mark} className="absolute top-0 h-full w-px bg-[#ffffff15]" style={{ left: `${(mark / 2.0) * 100}%` }} />
+                  ))}
+                </div>
+                <div className="flex justify-between mt-1">
+                  <span className="text-[10px] text-[#ffffff20]">0.00</span>
+                  <span className="text-[10px] text-[#ffffff20]">1.00</span>
+                  <span className="text-[10px] text-[#ffffff20]">2.00</span>
+                </div>
+              </div>
+              {[
+                { label: "K/D Ratio",  val: stats.kd.toFixed(2),        pct: Math.min((stats.kd / 2.0) * 100, 100), color: getRatingColor(stats.kd) },
+                { label: "ADR",        val: stats.adr.toFixed(1),        pct: Math.min((stats.adr / 130) * 100, 100), color: "#7c6af7" },
+                { label: "Headshot %", val: stats.hs.toFixed(1) + "%",   pct: Math.min(stats.hs, 100), color: "#ff6b35" },
+                { label: "KAST%",      val: stats.kast.toFixed(1) + "%", pct: Math.min(stats.kast, 100), color: "#00c8ff" },
+              ].map(({ label, val, pct, color }) => (
+                <div key={label}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs text-[#ffffff60] font-oswald tracking-widest uppercase">{label}</span>
+                    <span className="font-oswald font-bold text-sm text-white">{val}</span>
+                  </div>
+                  <div className="h-1.5 bg-[#ffffff08] overflow-hidden">
+                    <div className="h-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: color }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Последние матчи */}
-        <div className="bg-[#ffffff04] border border-[#ffffff08] p-6 mb-6 animate-fade-in" style={{ animationDelay: "120ms" }}>
+        <div className="bg-[#ffffff04] border border-[#ffffff08] p-6 mb-6 animate-fade-in" style={{ animationDelay: "140ms" }}>
           <div className="text-[10px] text-[#0aff88]/60 tracking-[0.4em] uppercase font-oswald mb-5">Последние матчи</div>
 
           {teamMatches.length === 0 ? (
@@ -257,7 +312,7 @@ export default function PlayerPage() {
         </div>
 
         {/* Команда */}
-        <div className="bg-[#ffffff04] border border-[#ffffff08] p-6 animate-fade-in" style={{ animationDelay: "200ms" }}>
+        <div className="bg-[#ffffff04] border border-[#ffffff08] p-6 animate-fade-in" style={{ animationDelay: "180ms" }}>
           <div className="text-[10px] text-[#0aff88]/60 tracking-[0.4em] uppercase font-oswald mb-4">Команда · {team.name}</div>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
             {team.players.map((p, i) => {
