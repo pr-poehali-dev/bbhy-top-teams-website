@@ -26,18 +26,18 @@ export const tournaments: Tournament[] = [
     name: "W Starladder",
     status: "upcoming",
     prize: "",
-    teams: 0,
+    teams: 7,
     date: "7 мар 2026",
-    description: "Текущий турнир W Starladder стартует 7 марта",
+    description: "Текущий турнир W Starladder стартует 7 марта. Зарегистрировано 7 из 16 команд.",
   },
   {
     id: 2,
     name: "RIEM RIO",
     status: "upcoming",
     prize: "",
-    teams: 0,
+    teams: 16,
     date: "7 мар 2026",
-    description: "Турнир RIEM RIO стартует 7 марта",
+    description: "Турнир RIEM RIO стартует 7 марта. Все 16 из 16 команд уже зарегистрированы.",
   },
 ];
 
