@@ -60,32 +60,14 @@ function deriveStats(name: string, rating: number) {
   };
 }
 
-const MAPS = ["Mirage", "Inferno", "Nuke", "Ancient", "Anubis", "Dust2", "Vertigo"];
-const OPPONENTS = ["XTREME Gaming", "MV Team", "1337 Team", "Evo Team", "Lotus Team", "Raven Core Unit", "Vanity Team"];
-
-function deriveMatches(name: string, teamName: string, rating: number) {
-  return Array.from({ length: 6 }, (_, i) => {
-    const r = (idx: number) => seededRandom(name, 100 + i * 10 + idx);
-    const won = r(0) < (0.3 + rating * 0.35);
-    const kills = Math.round(14 + rating * 8 + r(1) * 6);
-    const deaths = Math.round(10 + (2 - rating) * 6 + r(2) * 5);
-    const assists = Math.round(r(3) * 6);
-    const kd = kills / Math.max(deaths, 1);
-    const matchRating = parseFloat((0.7 + rating * 0.35 + r(4) * 0.3).toFixed(2));
-    const opponent = OPPONENTS.filter(o => o !== teamName)[Math.floor(r(5) * (OPPONENTS.length - 1))];
-    const map = MAPS[Math.floor(r(6) * MAPS.length)];
-    const scoreA = won ? (Math.floor(r(7) * 3) === 0 ? 13 : 16) : Math.floor(r(7) * 12) + 4;
-    const scoreB = won ? Math.floor(r(8) * 10) + 3 : (Math.floor(r(8) * 3) === 0 ? 13 : 16);
-    const days = Math.round(r(9) * 20) + 1;
-    return { won, kills, deaths, assists, kd: parseFloat(kd.toFixed(2)), matchRating, opponent, map, scoreA, scoreB, days };
-  });
-}
+const TEAM_MATCHES: Record<string, { won: boolean; opponent: string; scoreA: number; scoreB: number; tournament: string; date: string }[]> = {
+  "vanity team":   [{ won: true,  opponent: "XTREME Gaming", scoreA: 3, scoreB: 0, tournament: "W Cup", date: "1 мар 2026" }],
+  "xtreme gaming": [{ won: false, opponent: "Vanity Team",   scoreA: 0, scoreB: 3, tournament: "W Cup", date: "1 мар 2026" }],
+};
 
 export default function PlayerPage() {
   const { teamSlug, playerName } = useParams<{ teamSlug: string; playerName: string }>();
   const navigate = useNavigate();
-  const [statsOpen, setStatsOpen] = useState(false);
-
   const team = teams.find(t => t.name.toLowerCase().replace(/\s+/g, "-") === teamSlug);
   const player = team?.players.find(p => p.name.toLowerCase() === playerName?.toLowerCase());
 
@@ -103,11 +85,9 @@ export default function PlayerPage() {
     );
   }
 
-  const stats = deriveStats(player.name, player.rating);
-  const matches = deriveMatches(player.name, team.name, player.rating);
+  const teamMatches = TEAM_MATCHES[team.name.toLowerCase()] ?? [];
   const ratingColor = getRatingColor(player.rating);
   const ratingLabel = getRatingLabel(player.rating);
-  const ratingPct = Math.min((player.rating / 2.0) * 100, 100);
   const fp = getFirepower(player.rating);
   const trophies = TROPHIES[player.name.toLowerCase()] ?? [];
 
@@ -222,124 +202,58 @@ export default function PlayerPage() {
             </div>
           </div>
 
-          {/* Быстрые статы */}
-          <div className="sm:col-span-2 grid grid-cols-2 gap-3 animate-fade-in" style={{ animationDelay: "80ms" }}>
-            {[
-              { label: "K/D Ratio", value: stats.kd.toFixed(2), color: getRatingColor(stats.kd) },
-              { label: "ADR",       value: stats.adr.toFixed(1), color: "#7c6af7" },
-              { label: "HS%",       value: stats.hs.toFixed(1) + "%", color: "#ff6b35" },
-              { label: "KAST%",     value: stats.kast.toFixed(1) + "%", color: "#00c8ff" },
-            ].map(({ label, value, color }) => (
-              <div key={label} className="bg-[#ffffff04] border border-[#ffffff08] p-4">
-                <div className="text-[10px] text-[#ffffff40] font-oswald tracking-widest uppercase mb-1">{label}</div>
-                <div className="font-oswald font-bold text-2xl" style={{ color }}>{value}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Детальная статистика — раскрывалка */}
-        <div className="mb-6 animate-fade-in" style={{ animationDelay: "110ms" }}>
-          <button
-            onClick={() => setStatsOpen(v => !v)}
-            className="w-full flex items-center justify-between px-5 py-3 bg-[#ffffff04] border border-[#ffffff08] hover:border-[#0aff88]/30 hover:bg-[#0aff88]/5 transition-all duration-200 group"
-          >
-            <span className="text-[10px] text-[#ffffff50] group-hover:text-[#0aff88] tracking-[0.4em] uppercase font-oswald transition-colors">
-              Детальная статистика
-            </span>
-            <Icon name={statsOpen ? "ChevronUp" : "ChevronDown"} size={14} className="text-[#ffffff30] group-hover:text-[#0aff88] transition-colors" />
-          </button>
-
-          {statsOpen && (
-            <div className="bg-[#ffffff04] border border-t-0 border-[#ffffff08] p-6 space-y-5">
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs text-[#ffffff60] font-oswald tracking-widest uppercase">Рейтинг 2.0</span>
-                  <span className="font-oswald font-bold text-sm" style={{ color: ratingColor }}>{player.rating.toFixed(2)}</span>
-                </div>
-                <div className="h-2 bg-[#ffffff08] overflow-hidden relative">
-                  <div className="h-full transition-all duration-700" style={{ width: `${ratingPct}%`, backgroundColor: ratingColor }} />
-                  {[0.5, 1.0, 1.5].map(mark => (
-                    <div key={mark} className="absolute top-0 h-full w-px bg-[#ffffff15]" style={{ left: `${(mark / 2.0) * 100}%` }} />
-                  ))}
-                </div>
-                <div className="flex justify-between mt-1">
-                  <span className="text-[10px] text-[#ffffff20]">0.00</span>
-                  <span className="text-[10px] text-[#ffffff20]">1.00</span>
-                  <span className="text-[10px] text-[#ffffff20]">2.00</span>
-                </div>
-              </div>
-
-              {[
-                { label: "K/D Ratio", val: stats.kd.toFixed(2), pct: Math.min((stats.kd / 2.0) * 100, 100), color: getRatingColor(stats.kd) },
-                { label: "ADR",       val: stats.adr.toFixed(1), pct: Math.min((stats.adr / 120) * 100, 100), color: "#7c6af7" },
-                { label: "Headshot %", val: stats.hs.toFixed(1) + "%", pct: Math.min(stats.hs, 100), color: "#ff6b35" },
-                { label: "KAST%",     val: stats.kast.toFixed(1) + "%", pct: Math.min(stats.kast, 100), color: "#00c8ff" },
-              ].map(({ label, val, pct, color }) => (
-                <div key={label}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs text-[#ffffff60] font-oswald tracking-widest uppercase">{label}</span>
-                    <span className="font-oswald font-bold text-sm text-white">{val}</span>
-                  </div>
-                  <div className="h-1.5 bg-[#ffffff08] overflow-hidden">
-                    <div className="h-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: color }} />
-                  </div>
-                </div>
-              ))}
+          {/* Заглушка статов */}
+          <div className="sm:col-span-2 flex items-center justify-center bg-[#ffffff04] border border-[#ffffff08] animate-fade-in" style={{ animationDelay: "80ms" }}>
+            <div className="text-center py-8 px-4">
+              <Icon name="Clock" size={28} className="text-[#ffffff20] mx-auto mb-3" />
+              <div className="font-oswald text-sm text-[#ffffff30] tracking-widest uppercase">Статистика скоро</div>
+              <div className="text-[11px] text-[#ffffff20] mt-1">Данные будут добавлены позже</div>
             </div>
-          )}
+          </div>
         </div>
 
-        {/* История матчей */}
-        <div className="bg-[#ffffff04] border border-[#ffffff08] p-6 mb-6 animate-fade-in" style={{ animationDelay: "160ms" }}>
+        {/* Последние матчи */}
+        <div className="bg-[#ffffff04] border border-[#ffffff08] p-6 mb-6 animate-fade-in" style={{ animationDelay: "120ms" }}>
           <div className="text-[10px] text-[#0aff88]/60 tracking-[0.4em] uppercase font-oswald mb-5">Последние матчи</div>
-          <div className="grid grid-cols-[60px_1fr_70px_100px_60px_60px] gap-2 px-3 py-1.5 text-[10px] text-[#ffffff25] tracking-[0.2em] uppercase font-oswald mb-1">
-            <span>Итог</span>
-            <span>Соперник · Карта</span>
-            <span className="text-center">Счёт</span>
-            <span className="text-center hidden sm:block">K / D / A</span>
-            <span className="text-right hidden sm:block">K/D</span>
-            <span className="text-right">RTG</span>
-          </div>
-          <div className="space-y-1">
-            {matches.map((m, i) => {
-              const kdColor = m.kd >= 1.2 ? "#0aff88" : m.kd >= 0.9 ? "#ffaa00" : "#ff4466";
-              const rtgColor = getRatingColor(m.matchRating);
-              return (
-                <div key={i} className="grid grid-cols-[60px_1fr_70px_100px_60px_60px] gap-2 px-3 py-3 border border-transparent hover:bg-[#ffffff04] transition-colors">
-                  <div className="flex items-center">
-                    <span className={`font-oswald font-bold text-xs px-2 py-0.5 ${m.won ? "bg-[#0aff88]/15 text-[#0aff88]" : "bg-[#ff4466]/15 text-[#ff4466]"}`}>
-                      {m.won ? "WIN" : "LOSE"}
-                    </span>
+
+          {teamMatches.length === 0 ? (
+            <div className="text-center py-8">
+              <Icon name="Clock" size={24} className="text-[#ffffff20] mx-auto mb-2" />
+              <div className="font-oswald text-sm text-[#ffffff30] tracking-widest uppercase">Матчей пока нет</div>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-[60px_1fr_80px_1fr] gap-3 px-3 py-1.5 text-[10px] text-[#ffffff25] tracking-[0.2em] uppercase font-oswald mb-1">
+                <span>Итог</span>
+                <span>Соперник</span>
+                <span className="text-center">Счёт</span>
+                <span>Турнир · Дата</span>
+              </div>
+              <div className="space-y-1">
+                {teamMatches.map((m, i) => (
+                  <div key={i} className="grid grid-cols-[60px_1fr_80px_1fr] gap-3 px-3 py-3 border border-transparent hover:bg-[#ffffff04] transition-colors">
+                    <div className="flex items-center">
+                      <span className={`font-oswald font-bold text-xs px-2 py-0.5 ${m.won ? "bg-[#0aff88]/15 text-[#0aff88]" : "bg-[#ff4466]/15 text-[#ff4466]"}`}>
+                        {m.won ? "WIN" : "LOSE"}
+                      </span>
+                    </div>
+                    <div className="flex items-center min-w-0">
+                      <span className="font-oswald text-sm text-white truncate">{m.opponent}</span>
+                    </div>
+                    <div className="flex items-center justify-center">
+                      <span className={`font-oswald font-bold text-sm ${m.won ? "text-[#0aff88]" : "text-[#ff4466]"}`}>
+                        {m.scoreA}:{m.scoreB}
+                      </span>
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <span className="font-oswald text-sm text-[#ffffff60]">{m.tournament}</span>
+                      <span className="text-[10px] text-[#ffffff30]">{m.date}</span>
+                    </div>
                   </div>
-                  <div className="flex flex-col justify-center min-w-0">
-                    <span className="font-oswald text-sm text-white truncate">{m.opponent}</span>
-                    <span className="text-[10px] text-[#ffffff40]">{m.map} · {m.days}д назад</span>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <span className={`font-oswald font-bold text-sm ${m.won ? "text-[#0aff88]" : "text-[#ff4466]"}`}>
-                      {m.scoreA}:{m.scoreB}
-                    </span>
-                  </div>
-                  <div className="hidden sm:flex items-center justify-center">
-                    <span className="font-oswald text-sm text-white">
-                      <span className="text-[#0aff88]">{m.kills}</span>
-                      <span className="text-[#ffffff30]"> / </span>
-                      <span className="text-[#ff4466]">{m.deaths}</span>
-                      <span className="text-[#ffffff30]"> / </span>
-                      <span className="text-[#ffffff60]">{m.assists}</span>
-                    </span>
-                  </div>
-                  <div className="hidden sm:flex items-center justify-end">
-                    <span className="font-oswald font-bold text-sm" style={{ color: kdColor }}>{m.kd.toFixed(2)}</span>
-                  </div>
-                  <div className="flex items-center justify-end">
-                    <span className="font-oswald font-bold text-sm" style={{ color: rtgColor }}>{m.matchRating.toFixed(2)}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Команда */}
