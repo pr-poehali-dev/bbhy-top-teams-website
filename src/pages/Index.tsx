@@ -2,6 +2,34 @@ import { useState } from "react";
 import { type Tab } from "@/data/teams";
 import RankingTab from "@/components/RankingTab";
 import PlayersTab from "@/components/PlayersTab";
+import EventsTab from "@/components/EventsTab";
+import NewsTab from "@/components/NewsTab";
+
+const TABS: [Tab, string][] = [
+  ["ranking", "Рейтинг"],
+  ["players", "Игроки"],
+  ["events", "События"],
+  ["news", "Новости"],
+];
+
+const HERO: Record<Tab, { title: JSX.Element; sub: string }> = {
+  ranking: {
+    title: <>ТОП <span className="text-[#0aff88]">6</span> КОМАНД</>,
+    sub: "Официальный рейтинг BBHY · Tier 6 регион",
+  },
+  players: {
+    title: <>ВСЕ <span className="text-[#0aff88]">ИГРОКИ</span></>,
+    sub: "Рейтинг игроков по всем командам · сезон 2026",
+  },
+  events: {
+    title: <>БЛИЖАЙШИЕ <span className="text-[#0aff88]">СОБЫТИЯ</span></>,
+    sub: "Текущие турниры и матчи недели",
+  },
+  news: {
+    title: <><span className="text-[#0aff88]">НОВОСТИ</span> BBHY</>,
+    sub: "Последние события лиги · сезон 2026",
+  },
+};
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState<Tab>("ranking");
@@ -27,12 +55,12 @@ export default function Index() {
             </div>
           </div>
 
-          <nav className="flex gap-1">
-            {([["ranking", "Рейтинг"], ["players", "Игроки"]] as [Tab, string][]).map(([tab, label]) => (
+          <nav className="flex gap-1 flex-wrap justify-end">
+            {TABS.map(([tab, label]) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-5 py-2 font-oswald text-sm tracking-widest uppercase transition-all duration-200 ${
+                className={`px-4 py-2 font-oswald text-sm tracking-widest uppercase transition-all duration-200 ${
                   activeTab === tab
                     ? "bg-[#0aff88] text-black"
                     : "text-[#ffffff40] hover:text-white border border-transparent hover:border-[#0aff88]/30"
@@ -49,22 +77,20 @@ export default function Index() {
         {/* Hero */}
         <div className="mb-8 animate-fade-in">
           <div className="text-[10px] text-[#0aff88] tracking-[0.4em] uppercase mb-2">
-            — Обновлено: Февраль 2026
+            — Обновлено: Март 2026
           </div>
           <h1 className="font-oswald text-4xl md:text-5xl font-bold tracking-tight text-white">
-            {activeTab === "ranking" ? (
-              <>ТОП <span className="text-[#0aff88]">15</span> КОМАНД</>
-            ) : (
-              <>ВСЕ <span className="text-[#0aff88]">75</span> ИГРОКОВ</>
-            )}
+            {HERO[activeTab].title}
           </h1>
           <p className="text-[#ffffff40] text-sm mt-1">
-            {activeTab === "ranking" ? "Официальный рейтинг BBHY · Tier 6 регион" : "Рейтинг игроков по всем командам · сезон 2026"}
+            {HERO[activeTab].sub}
           </p>
         </div>
 
         {activeTab === "ranking" && <RankingTab />}
         {activeTab === "players" && <PlayersTab />}
+        {activeTab === "events" && <EventsTab />}
+        {activeTab === "news" && <NewsTab />}
       </main>
 
       {/* Footer */}

@@ -1,4 +1,4 @@
-export type Tab = "ranking" | "players";
+export type Tab = "ranking" | "players" | "events" | "news";
 
 export interface Player {
   name: string;
@@ -125,6 +125,7 @@ export const teams: Team[] = [
       { name: "poipoq", role: "AWP+IGL", rating: 0.99 },
       { name: "satan1k", role: "RIFLER", rating: 1.02 },
       { name: "Bonk", role: "RIFLER", rating: 1.03 },
+      { name: "Akaki", role: "LURKER", rating: 1.00 },
     ],
   },
 ];
