@@ -45,6 +45,27 @@ function deriveStats(name: string, rating: number) {
   };
 }
 
+const MAPS = ["Mirage", "Inferno", "Nuke", "Ancient", "Anubis", "Dust2", "Vertigo"];
+const OPPONENTS = ["XTREME Gaming", "MV Team", "1337 Team", "Evo Team", "Lotus Team", "Raven Core Unit", "Vanity Team"];
+
+function deriveMatches(name: string, teamName: string, rating: number) {
+  return Array.from({ length: 6 }, (_, i) => {
+    const r = (idx: number) => seededRandom(name, 100 + i * 10 + idx);
+    const won = r(0) < (0.3 + rating * 0.35);
+    const kills = Math.round(14 + rating * 8 + r(1) * 6);
+    const deaths = Math.round(10 + (2 - rating) * 6 + r(2) * 5);
+    const assists = Math.round(r(3) * 6);
+    const kd = (kills / Math.max(deaths, 1));
+    const matchRating = parseFloat((0.7 + rating * 0.35 + r(4) * 0.3).toFixed(2));
+    const opponent = OPPONENTS.filter(o => o !== teamName)[Math.floor(r(5) * (OPPONENTS.length - 1))];
+    const map = MAPS[Math.floor(r(6) * MAPS.length)];
+    const scoreA = won ? (Math.floor(r(7) * 3) === 0 ? 13 : 16) : Math.floor(r(7) * 12) + 4;
+    const scoreB = won ? Math.floor(r(8) * 10) + 3 : (Math.floor(r(8) * 3) === 0 ? 13 : 16);
+    const days = Math.round(r(9) * 20) + 1;
+    return { won, kills, deaths, assists, kd: parseFloat(kd.toFixed(2)), matchRating, opponent, map, scoreA, scoreB, days };
+  });
+}
+
 export default function PlayerPage() {
   const { teamSlug, playerName } = useParams<{ teamSlug: string; playerName: string }>();
   const navigate = useNavigate();
@@ -67,6 +88,7 @@ export default function PlayerPage() {
   }
 
   const stats = deriveStats(player.name, player.rating);
+  const matches = deriveMatches(player.name, team.name, player.rating);
   const ratingColor = getRatingColor(player.rating);
   const ratingLabel = getRatingLabel(player.rating);
   const ratingPct = Math.min((player.rating / 2.0) * 100, 100);
@@ -248,8 +270,78 @@ export default function PlayerPage() {
           </div>
         </div>
 
+        {/* История матчей */}
+        <div className="bg-[#ffffff04] border border-[#ffffff08] p-6 mb-6 animate-fade-in" style={{ animationDelay: "160ms" }}>
+          <div className="text-[10px] text-[#0aff88]/60 tracking-[0.4em] uppercase font-oswald mb-5">Последние матчи</div>
+
+          {/* Заголовок таблицы */}
+          <div className="grid grid-cols-[60px_1fr_80px_100px_60px_60px] gap-2 px-3 py-1.5 text-[10px] text-[#ffffff25] tracking-[0.2em] uppercase font-oswald mb-1">
+            <span>Итог</span>
+            <span>Соперник · Карта</span>
+            <span className="text-center">Счёт</span>
+            <span className="text-center hidden sm:block">K / D / A</span>
+            <span className="text-right hidden sm:block">K/D</span>
+            <span className="text-right">RTG</span>
+          </div>
+
+          <div className="space-y-1">
+            {matches.map((m, i) => {
+              const kdColor = m.kd >= 1.2 ? "#0aff88" : m.kd >= 0.9 ? "#ffaa00" : "#ff4466";
+              const rtgColor = getRatingColor(m.matchRating);
+              return (
+                <div
+                  key={i}
+                  className="grid grid-cols-[60px_1fr_80px_100px_60px_60px] gap-2 px-3 py-3 border border-transparent hover:bg-[#ffffff04] transition-colors"
+                  style={{ animationDelay: `${i * 30}ms` }}
+                >
+                  {/* Победа/поражение */}
+                  <div className="flex items-center">
+                    <span className={`font-oswald font-bold text-xs px-2 py-0.5 ${m.won ? "bg-[#0aff88]/15 text-[#0aff88]" : "bg-[#ff4466]/15 text-[#ff4466]"}`}>
+                      {m.won ? "WIN" : "LOSE"}
+                    </span>
+                  </div>
+
+                  {/* Соперник + карта */}
+                  <div className="flex flex-col justify-center min-w-0">
+                    <span className="font-oswald text-sm text-white truncate">{m.opponent}</span>
+                    <span className="text-[10px] text-[#ffffff40]">{m.map} · {m.days}д назад</span>
+                  </div>
+
+                  {/* Счёт */}
+                  <div className="flex items-center justify-center">
+                    <span className={`font-oswald font-bold text-sm ${m.won ? "text-[#0aff88]" : "text-[#ff4466]"}`}>
+                      {m.scoreA}:{m.scoreB}
+                    </span>
+                  </div>
+
+                  {/* K/D/A */}
+                  <div className="hidden sm:flex items-center justify-center">
+                    <span className="font-oswald text-sm text-white">
+                      <span className="text-[#0aff88]">{m.kills}</span>
+                      <span className="text-[#ffffff30]"> / </span>
+                      <span className="text-[#ff4466]">{m.deaths}</span>
+                      <span className="text-[#ffffff30]"> / </span>
+                      <span className="text-[#ffffff60]">{m.assists}</span>
+                    </span>
+                  </div>
+
+                  {/* K/D */}
+                  <div className="hidden sm:flex items-center justify-end">
+                    <span className="font-oswald font-bold text-sm" style={{ color: kdColor }}>{m.kd.toFixed(2)}</span>
+                  </div>
+
+                  {/* Рейтинг матча */}
+                  <div className="flex items-center justify-end">
+                    <span className="font-oswald font-bold text-sm" style={{ color: rtgColor }}>{m.matchRating.toFixed(2)}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Команда */}
-        <div className="bg-[#ffffff04] border border-[#ffffff08] p-6 animate-fade-in" style={{ animationDelay: "160ms" }}>
+        <div className="bg-[#ffffff04] border border-[#ffffff08] p-6 animate-fade-in" style={{ animationDelay: "200ms" }}>
           <div className="text-[10px] text-[#0aff88]/60 tracking-[0.4em] uppercase font-oswald mb-4">Команда · {team.name}</div>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
             {team.players.map((p, i) => {
