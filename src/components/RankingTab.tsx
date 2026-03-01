@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { teams } from "@/data/teams";
 
 export default function RankingTab() {
   const [expandedTeam, setExpandedTeam] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-1">
@@ -98,17 +100,24 @@ export default function RankingTab() {
               <div className="bg-[#0a0d14] border border-t-0 border-[#0aff88]/20 px-4 py-4">
                 <div className="text-[10px] text-[#0aff88]/60 tracking-[0.3em] uppercase mb-3 font-oswald">Состав команды</div>
                 <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
-                  {team.players.map((player, pi) => (
-                    <div key={pi} className="bg-[#ffffff04] border border-[#ffffff08] px-3 py-2 hover:border-[#0aff88]/30 transition-colors">
-                      <div className="font-oswald text-sm text-white truncate">{player.name}</div>
-                      <div className="flex items-center justify-between mt-1">
-                        <span className="text-[10px] text-[#ffffff40]">{player.role}</span>
-                        <span className={`text-[10px] font-bold ${player.rating >= 1.2 ? "text-[#0aff88]" : player.rating >= 1.0 ? "text-[#ffaa00]" : "text-[#ff4466]"}`}>
-                          {player.rating.toFixed(2)}
-                        </span>
+                  {team.players.map((player, pi) => {
+                    const teamSlug = team.name.toLowerCase().replace(/\s+/g, "-");
+                    return (
+                      <div
+                        key={pi}
+                        onClick={(e) => { e.stopPropagation(); navigate(`/player/${teamSlug}/${player.name.toLowerCase()}`); }}
+                        className="bg-[#ffffff04] border border-[#ffffff08] px-3 py-2 hover:border-[#0aff88]/30 hover:bg-[#0aff88]/5 transition-colors cursor-pointer"
+                      >
+                        <div className="font-oswald text-sm text-white truncate hover:text-[#0aff88] transition-colors">{player.name}</div>
+                        <div className="flex items-center justify-between mt-1">
+                          <span className="text-[10px] text-[#ffffff40]">{player.role}</span>
+                          <span className={`text-[10px] font-bold ${player.rating >= 1.2 ? "text-[#0aff88]" : player.rating >= 1.0 ? "text-[#ffaa00]" : "text-[#ff4466]"}`}>
+                            {player.rating.toFixed(2)}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
