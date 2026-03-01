@@ -9,9 +9,9 @@ export interface NewsItem {
 export const news: NewsItem[] = [
   {
     id: 1,
-    title: "BBHY Spring Cup 2026 стартовал!",
-    content: "Главный весенний турнир сезона официально начался. 8 лучших команд региона борются за призовой фонд 50 000 ₽. Групповой этап продлится до 10 марта.",
-    date: "15 фев 2026",
+    title: "Vanity Team выиграли W Cup — 3:0 в финале против XTREME Gaming!",
+    content: "Команда Vanity Team одержала уверенную победу в финале W Cup, разгромив XTREME Gaming со счётом 3:0. [Жду твои 2 предложения — добавлю сюда]",
+    date: "1 мар 2026",
     tag: "Турнир",
   },
   {
