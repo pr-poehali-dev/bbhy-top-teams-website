@@ -133,7 +133,7 @@ export default function Index() {
                 Хочешь стать спонсором BBHY и поддержать развитие CS2 Tier 6 сцены?
               </p>
               <a
-                href="https://t.me/+QgiLIa1gFRY4Y2Iy"
+                href="https://t.me/rrubbiqq"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 bg-[#0aff88] text-black font-oswald font-bold text-sm tracking-widest uppercase hover:bg-[#00cc6e] transition-colors"

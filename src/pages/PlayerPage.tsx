@@ -2,14 +2,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { teams } from "@/data/teams";
 import Icon from "@/components/ui/icon";
 
-const STATS = [
-  { label: "Рейтинг 2.0", key: "rating", max: 2.0 },
-  { label: "K/D Ratio", key: "kd", max: 2.0 },
-  { label: "ADR", key: "adr", max: 120 },
-  { label: "HS%", key: "hs", max: 100 },
-  { label: "KAST", key: "kast", max: 100 },
-];
-
 function getRatingColor(r: number) {
   if (r >= 1.2) return "#0aff88";
   if (r >= 1.0) return "#ffaa00";
@@ -23,14 +15,33 @@ function getRatingLabel(r: number) {
   return "НИЗКИЙ";
 }
 
-function deriveStats(rating: number) {
-  const base = rating;
+function getFirepowerLabel(r: number): { label: string; desc: string; color: string; bars: number } {
+  if (r >= 1.4) return { label: "S+", desc: "Доминирует в каждом раунде", color: "#0aff88", bars: 5 };
+  if (r >= 1.3) return { label: "S",  desc: "Высочайший уровень агрессии", color: "#0aff88", bars: 5 };
+  if (r >= 1.2) return { label: "A+", desc: "Мощная огневая поддержка", color: "#7dffbe", bars: 4 };
+  if (r >= 1.1) return { label: "A",  desc: "Выше среднего по сцене", color: "#ffaa00", bars: 3 };
+  if (r >= 1.0) return { label: "B",  desc: "Стабильный средний уровень", color: "#ffaa00", bars: 2 };
+  return           { label: "C",  desc: "Требует улучшений", color: "#ff4466", bars: 1 };
+}
+
+// Детерминированный сид на основе имени — фиксирует статы навсегда
+function seededRandom(seed: string, index: number): number {
+  let h = index * 2654435761;
+  for (let i = 0; i < seed.length; i++) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 2246822519);
+    h ^= h >>> 13;
+  }
+  return ((h >>> 0) % 1000) / 1000;
+}
+
+function deriveStats(name: string, rating: number) {
   return {
     rating,
-    kd: parseFloat((base * 0.98 + Math.random() * 0.04).toFixed(2)),
-    adr: parseFloat((base * 72 + Math.random() * 8).toFixed(1)),
-    hs: parseFloat((28 + base * 18 + Math.random() * 8).toFixed(1)),
-    kast: parseFloat((55 + base * 20 + Math.random() * 5).toFixed(1)),
+    kd:   parseFloat((rating * 0.96 + seededRandom(name, 1) * 0.08).toFixed(2)),
+    adr:  parseFloat((rating * 70 + seededRandom(name, 2) * 12).toFixed(1)),
+    hs:   parseFloat((26 + rating * 16 + seededRandom(name, 3) * 10).toFixed(1)),
+    kast: parseFloat((52 + rating * 22 + seededRandom(name, 4) * 6).toFixed(1)),
   };
 }
 
@@ -55,10 +66,11 @@ export default function PlayerPage() {
     );
   }
 
-  const stats = deriveStats(player.rating);
+  const stats = deriveStats(player.name, player.rating);
   const ratingColor = getRatingColor(player.rating);
   const ratingLabel = getRatingLabel(player.rating);
   const ratingPct = Math.min((player.rating / 2.0) * 100, 100);
+  const fp = getFirepowerLabel(player.rating);
 
   return (
     <div className="min-h-screen bg-[#080A0F] text-white font-ibm overflow-x-hidden">
@@ -103,13 +115,11 @@ export default function PlayerPage() {
         {/* Профиль */}
         <div className="bg-[#0aff88]/5 border border-[#0aff88]/20 p-8 mb-6 animate-fade-in">
           <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-            {/* Аватар */}
             <div className="w-20 h-20 border-2 flex items-center justify-center flex-shrink-0" style={{ borderColor: ratingColor }}>
               <span className="font-oswald font-bold text-2xl" style={{ color: ratingColor }}>
                 {player.name.slice(0, 2).toUpperCase()}
               </span>
             </div>
-
             <div className="flex-1 min-w-0">
               <div className="text-[10px] tracking-[0.4em] uppercase mb-1 font-oswald" style={{ color: ratingColor }}>
                 — {team.name} · {player.role}
@@ -124,8 +134,6 @@ export default function PlayerPage() {
                 <span className="text-[#ffffff40] text-xs">{team.country} {team.name}</span>
               </div>
             </div>
-
-            {/* Главный рейтинг */}
             <div className="text-right">
               <div className="text-[10px] text-[#ffffff40] tracking-[0.3em] uppercase font-oswald mb-1">Рейтинг 2.0</div>
               <div className="font-oswald font-bold text-5xl" style={{ color: ratingColor }}>
@@ -135,28 +143,59 @@ export default function PlayerPage() {
           </div>
         </div>
 
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+
+          {/* Firepower */}
+          <div className="sm:col-span-1 bg-[#ffffff04] border border-[#ffffff08] p-5 animate-fade-in flex flex-col justify-between" style={{ animationDelay: "60ms" }}>
+            <div className="text-[10px] text-[#0aff88]/60 tracking-[0.4em] uppercase font-oswald mb-4">Firepower</div>
+            <div className="flex items-end justify-between mb-3">
+              <div>
+                <div className="font-oswald font-bold text-5xl leading-none" style={{ color: fp.color }}>{fp.label}</div>
+                <div className="text-[11px] mt-1.5" style={{ color: fp.color + "99" }}>{fp.desc}</div>
+              </div>
+              <Icon name="Flame" size={36} style={{ color: fp.color, opacity: 0.7 }} />
+            </div>
+            <div className="flex gap-1 mt-2">
+              {[1,2,3,4,5].map(i => (
+                <div
+                  key={i}
+                  className="flex-1 h-2 transition-all duration-500"
+                  style={{ backgroundColor: i <= fp.bars ? fp.color : fp.color + "20" }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Быстрые статы */}
+          <div className="sm:col-span-2 grid grid-cols-2 gap-3 animate-fade-in" style={{ animationDelay: "80ms" }}>
+            {[
+              { label: "K/D Ratio", value: stats.kd.toFixed(2), color: getRatingColor(stats.kd) },
+              { label: "ADR",       value: stats.adr.toFixed(1), color: "#7c6af7" },
+              { label: "HS%",       value: stats.hs.toFixed(1) + "%", color: "#ff6b35" },
+              { label: "KAST%",     value: stats.kast.toFixed(1) + "%", color: "#00c8ff" },
+            ].map(({ label, value, color }) => (
+              <div key={label} className="bg-[#ffffff04] border border-[#ffffff08] p-4">
+                <div className="text-[10px] text-[#ffffff40] font-oswald tracking-widest uppercase mb-1">{label}</div>
+                <div className="font-oswald font-bold text-2xl" style={{ color }}>{value}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Статы с прогресс-барами */}
-        <div className="bg-[#ffffff04] border border-[#ffffff08] p-6 mb-6 animate-fade-in" style={{ animationDelay: "80ms" }}>
-          <div className="text-[10px] text-[#0aff88]/60 tracking-[0.4em] uppercase font-oswald mb-6">Статистика</div>
+        <div className="bg-[#ffffff04] border border-[#ffffff08] p-6 mb-6 animate-fade-in" style={{ animationDelay: "120ms" }}>
+          <div className="text-[10px] text-[#0aff88]/60 tracking-[0.4em] uppercase font-oswald mb-6">Детальная статистика</div>
           <div className="space-y-5">
 
-            {/* Рейтинг 2.0 */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs text-[#ffffff60] font-oswald tracking-widest uppercase">Рейтинг 2.0</span>
                 <span className="font-oswald font-bold text-sm" style={{ color: ratingColor }}>{player.rating.toFixed(2)}</span>
               </div>
               <div className="h-2 bg-[#ffffff08] overflow-hidden relative">
-                <div
-                  className="h-full transition-all duration-700"
-                  style={{ width: `${ratingPct}%`, backgroundColor: ratingColor }}
-                />
+                <div className="h-full transition-all duration-700" style={{ width: `${ratingPct}%`, backgroundColor: ratingColor }} />
                 {[0.5, 1.0, 1.5].map(mark => (
-                  <div
-                    key={mark}
-                    className="absolute top-0 h-full w-px bg-[#ffffff15]"
-                    style={{ left: `${(mark / 2.0) * 100}%` }}
-                  />
+                  <div key={mark} className="absolute top-0 h-full w-px bg-[#ffffff15]" style={{ left: `${(mark / 2.0) * 100}%` }} />
                 ))}
               </div>
               <div className="flex justify-between mt-1">
@@ -166,59 +205,43 @@ export default function PlayerPage() {
               </div>
             </div>
 
-            {/* K/D */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs text-[#ffffff60] font-oswald tracking-widest uppercase">K/D Ratio</span>
                 <span className="font-oswald font-bold text-sm text-white">{stats.kd.toFixed(2)}</span>
               </div>
               <div className="h-1.5 bg-[#ffffff08] overflow-hidden">
-                <div
-                  className="h-full transition-all duration-700"
-                  style={{ width: `${Math.min((stats.kd / 2.0) * 100, 100)}%`, backgroundColor: getRatingColor(stats.kd) }}
-                />
+                <div className="h-full transition-all duration-700" style={{ width: `${Math.min((stats.kd / 2.0) * 100, 100)}%`, backgroundColor: getRatingColor(stats.kd) }} />
               </div>
             </div>
 
-            {/* ADR */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs text-[#ffffff60] font-oswald tracking-widest uppercase">ADR</span>
                 <span className="font-oswald font-bold text-sm text-white">{stats.adr.toFixed(1)}</span>
               </div>
               <div className="h-1.5 bg-[#ffffff08] overflow-hidden">
-                <div
-                  className="h-full bg-[#7c6af7] transition-all duration-700"
-                  style={{ width: `${Math.min((stats.adr / 120) * 100, 100)}%` }}
-                />
+                <div className="h-full bg-[#7c6af7] transition-all duration-700" style={{ width: `${Math.min((stats.adr / 120) * 100, 100)}%` }} />
               </div>
             </div>
 
-            {/* HS% */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs text-[#ffffff60] font-oswald tracking-widest uppercase">Headshot %</span>
                 <span className="font-oswald font-bold text-sm text-white">{stats.hs.toFixed(1)}%</span>
               </div>
               <div className="h-1.5 bg-[#ffffff08] overflow-hidden">
-                <div
-                  className="h-full bg-[#ff6b35] transition-all duration-700"
-                  style={{ width: `${Math.min(stats.hs, 100)}%` }}
-                />
+                <div className="h-full bg-[#ff6b35] transition-all duration-700" style={{ width: `${Math.min(stats.hs, 100)}%` }} />
               </div>
             </div>
 
-            {/* KAST */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs text-[#ffffff60] font-oswald tracking-widest uppercase">KAST%</span>
                 <span className="font-oswald font-bold text-sm text-white">{stats.kast.toFixed(1)}%</span>
               </div>
               <div className="h-1.5 bg-[#ffffff08] overflow-hidden">
-                <div
-                  className="h-full bg-[#00c8ff] transition-all duration-700"
-                  style={{ width: `${Math.min(stats.kast, 100)}%` }}
-                />
+                <div className="h-full bg-[#00c8ff] transition-all duration-700" style={{ width: `${Math.min(stats.kast, 100)}%` }} />
               </div>
             </div>
 
