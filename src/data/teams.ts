@@ -31,11 +31,11 @@ export const teams: Team[] = [
     winrate: 81,
     change: 0,
     players: [
-      { name: "rrubbi", role: "AWP", rating: 1.29 },
+      { name: "rrubbi", role: "AWP", rating: 1.25 },
       { name: "TheHail", role: "LURKER", rating: 1.35 },
       { name: "Flintyyy", role: "RIFLER", rating: 1.32 },
       { name: "Orehhh", role: "IGL", rating: 1.01 },
-      { name: "Sains_s", role: "RIFLER", rating: 1.26 },
+      { name: "Sains_s", role: "RIFLER", rating: 1.31 },
     ],
   },
   {
@@ -67,8 +67,8 @@ export const teams: Team[] = [
     winrate: 76,
     change: -1,
     players: [
-      { name: "m0nstor", role: "AWP", rating: 1.31 },
-      { name: "Raven", role: "RIFLER", rating: 1.21 },
+      { name: "m0nstor", role: "AWP", rating: 1.14 },
+      { name: "Raven", role: "RIFLER", rating: 1.12 },
       { name: "Alalakai", role: "RIFLER", rating: 1.17 },
       { name: "Koku", role: "IGL", rating: 1.12 },
       { name: "DqZzxt", role: "RIFLER", rating: 1.05 },
