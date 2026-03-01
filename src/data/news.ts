@@ -10,7 +10,7 @@ export const news: NewsItem[] = [
   {
     id: 1,
     title: "Vanity Team выиграли W Cup — 3:0 в финале против XTREME Gaming!",
-    content: "Команда Vanity Team одержала уверенную победу в финале W Cup, разгромив XTREME Gaming со счётом 3:0. [Жду твои 2 предложения — добавлю сюда]",
+    content: "Команда Vanity Team одержала уверенную победу в финале W Cup, разгромив XTREME Gaming со счётом 3:0.",
     date: "1 мар 2026",
     tag: "Турнир",
   },
