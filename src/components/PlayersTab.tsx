@@ -16,10 +16,8 @@ const allPlayers = teams
   .sort((a, b) => b.rating - a.rating);
 
 const ALL_ROLES = ["AWP", "IGL", "RIFLER", "LURKER"];
-const ALL_TEAMS = [...new Set(allPlayers.map((p) => p.team))];
 
 type SortKey = "rating" | "name" | "team";
-type RatingTier = "all" | "elite" | "high" | "mid" | "low";
 
 function getRatingColor(r: number) {
   if (r >= 1.2) return "#0aff88";
@@ -27,22 +25,10 @@ function getRatingColor(r: number) {
   return "#ff5577";
 }
 
-function getRatingTierLabel(tier: RatingTier) {
-  switch (tier) {
-    case "elite": return "≥ 1.40";
-    case "high":  return "1.20–1.39";
-    case "mid":   return "1.00–1.19";
-    case "low":   return "< 1.00";
-    default:      return "Все";
-  }
-}
-
 export default function PlayersTab() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [roles, setRoles] = useState<string[]>([]);
-  const [selectedTeam, setSelectedTeam] = useState<string>("all");
-  const [ratingTier, setRatingTier] = useState<RatingTier>("all");
   const [sortKey, setSortKey] = useState<SortKey>("rating");
   const [sortAsc, setSortAsc] = useState(false);
   const [view, setView] = useState<"list" | "grid">("list");
@@ -68,17 +54,6 @@ export default function PlayersTab() {
     if (roles.length > 0)
       list = list.filter((p) => roles.some((r) => p.role.includes(r)));
 
-    if (selectedTeam !== "all")
-      list = list.filter((p) => p.team === selectedTeam);
-
-    if (ratingTier !== "all")
-      list = list.filter((p) => {
-        if (ratingTier === "elite") return p.rating >= 1.4;
-        if (ratingTier === "high")  return p.rating >= 1.2 && p.rating < 1.4;
-        if (ratingTier === "mid")   return p.rating >= 1.0 && p.rating < 1.2;
-        return p.rating < 1.0;
-      });
-
     list.sort((a, b) => {
       let diff = 0;
       if (sortKey === "rating") diff = b.rating - a.rating;
@@ -88,15 +63,13 @@ export default function PlayersTab() {
     });
 
     return list;
-  }, [search, roles, selectedTeam, ratingTier, sortKey, sortAsc]);
+  }, [search, roles, sortKey, sortAsc]);
 
-  const hasFilters = search || roles.length > 0 || selectedTeam !== "all" || ratingTier !== "all";
+  const hasFilters = search || roles.length > 0;
 
   const resetAll = () => {
     setSearch("");
     setRoles([]);
-    setSelectedTeam("all");
-    setRatingTier("all");
     setSortKey("rating");
     setSortAsc(false);
   };
@@ -146,52 +119,6 @@ export default function PlayersTab() {
               }`}
             >
               {role}
-            </button>
-          ))}
-        </div>
-
-        {/* Рейтинг тир */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] text-[#ffffff30] tracking-[0.3em] uppercase font-oswald w-14">Тир</span>
-          {(["all", "elite", "high", "mid", "low"] as RatingTier[]).map((tier) => (
-            <button
-              key={tier}
-              onClick={() => setRatingTier(tier)}
-              className={`px-3 py-1 text-[10px] font-oswald tracking-widest uppercase border transition-all duration-150 ${
-                ratingTier === tier
-                  ? "bg-[#0aff88] text-black border-[#0aff88]"
-                  : "border-[#ffffff15] text-[#ffffff50] hover:border-[#0aff88]/40 hover:text-white"
-              }`}
-            >
-              {getRatingTierLabel(tier)}
-            </button>
-          ))}
-        </div>
-
-        {/* Команда */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] text-[#ffffff30] tracking-[0.3em] uppercase font-oswald w-14">Клан</span>
-          <button
-            onClick={() => setSelectedTeam("all")}
-            className={`px-3 py-1 text-[10px] font-oswald tracking-widest uppercase border transition-all duration-150 ${
-              selectedTeam === "all"
-                ? "bg-[#0aff88] text-black border-[#0aff88]"
-                : "border-[#ffffff15] text-[#ffffff50] hover:border-[#0aff88]/40 hover:text-white"
-            }`}
-          >
-            Все
-          </button>
-          {ALL_TEAMS.map((team) => (
-            <button
-              key={team}
-              onClick={() => setSelectedTeam(team)}
-              className={`px-3 py-1 text-[10px] font-oswald tracking-widest uppercase border transition-all duration-150 ${
-                selectedTeam === team
-                  ? "bg-[#0aff88] text-black border-[#0aff88]"
-                  : "border-[#ffffff15] text-[#ffffff50] hover:border-[#0aff88]/40 hover:text-white"
-              }`}
-            >
-              {team}
             </button>
           ))}
         </div>
