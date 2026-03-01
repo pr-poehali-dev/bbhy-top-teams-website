@@ -4,6 +4,7 @@ import RankingTab from "@/components/RankingTab";
 import PlayersTab from "@/components/PlayersTab";
 import EventsTab from "@/components/EventsTab";
 import NewsTab from "@/components/NewsTab";
+import AwardsTab from "@/components/AwardsTab";
 import Icon from "@/components/ui/icon";
 
 const TABS: [Tab, string, string, string][] = [
@@ -11,6 +12,7 @@ const TABS: [Tab, string, string, string][] = [
   ["players", "Игроки", "Users", "Статистика всех игроков"],
   ["events", "События", "Calendar", "Турниры и матчи"],
   ["news", "Новости", "Newspaper", "Последние события лиги"],
+  ["awards", "Номинации", "Award", "Лучшие игроки сезона"],
 ];
 
 const HERO: Record<Tab, { title: JSX.Element; sub: string }> = {
@@ -29,6 +31,10 @@ const HERO: Record<Tab, { title: JSX.Element; sub: string }> = {
   news: {
     title: <><span className="text-[#0aff88]">НОВОСТИ</span> BBHY</>,
     sub: "Последние события лиги · сезон 2026",
+  },
+  awards: {
+    title: <>НОМИНАЦИИ <span className="text-[#0aff88]">2026</span></>,
+    sub: "Лучшие игроки и команды сезона · BBHY Awards",
   },
 };
 
@@ -178,6 +184,7 @@ export default function Index() {
         {activeTab === "players" && <PlayersTab />}
         {activeTab === "events" && <EventsTab />}
         {activeTab === "news" && <NewsTab />}
+        {activeTab === "awards" && <AwardsTab />}
       </main>
 
       <footer className="relative z-10 border-t border-[#ffffff08] mt-16 py-6 text-center">

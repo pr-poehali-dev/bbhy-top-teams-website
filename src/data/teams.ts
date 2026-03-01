@@ -1,4 +1,4 @@
-export type Tab = "ranking" | "players" | "events" | "news";
+export type Tab = "ranking" | "players" | "events" | "news" | "awards";
 
 export interface Player {
   name: string;

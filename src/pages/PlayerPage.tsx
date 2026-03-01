@@ -51,13 +51,20 @@ function seededRandom(seed: string, index: number): number {
   return ((h >>> 0) % 1000) / 1000;
 }
 
-function deriveStats(name: string, rating: number) {
+function deriveStats(name: string, rating: number, role: string) {
+  const isAWP = role === "AWP";
+  const sniping = isAWP
+    ? (name.toLowerCase() === "rrubbi" ? 90 : Math.min(Math.round(40 + rating * 28 + seededRandom(name, 9) * 14), 100))
+    : null;
   return {
     rating,
-    kd:   parseFloat((rating * 0.96 + seededRandom(name, 1) * 0.08).toFixed(2)),
-    adr:  parseFloat((rating * 85 + seededRandom(name, 2) * 15).toFixed(1)),
-    hs:   parseFloat((26 + rating * 16 + seededRandom(name, 3) * 10).toFixed(1)),
-    kast: parseFloat((52 + rating * 22 + seededRandom(name, 4) * 6).toFixed(1)),
+    kd:        parseFloat((rating * 0.96 + seededRandom(name, 1) * 0.08).toFixed(2)),
+    adr:       parseFloat((rating * 74 + seededRandom(name, 2) * 11).toFixed(1)),
+    hs:        parseFloat((26 + rating * 16 + seededRandom(name, 3) * 10).toFixed(1)),
+    kast:      parseFloat((52 + rating * 22 + seededRandom(name, 4) * 6).toFixed(1)),
+    opening:   Math.min(Math.round(28 + rating * 28 + seededRandom(name, 7) * 18), 100),
+    clutching: Math.min(Math.round(18 + rating * 26 + seededRandom(name, 8) * 20), 100),
+    sniping,
   };
 }
 
@@ -88,7 +95,7 @@ export default function PlayerPage() {
     );
   }
 
-  const stats = deriveStats(player.name, player.rating);
+  const stats = deriveStats(player.name, player.rating, player.role);
   const teamMatches = TEAM_MATCHES[team.name.toLowerCase()] ?? [];
   const ratingColor = getRatingColor(player.rating);
   const ratingLabel = getRatingLabel(player.rating);
@@ -249,9 +256,12 @@ export default function PlayerPage() {
               </div>
               {[
                 { label: "K/D Ratio",  val: stats.kd.toFixed(2),        pct: Math.min((stats.kd / 2.0) * 100, 100), color: getRatingColor(stats.kd) },
-                { label: "ADR",        val: stats.adr.toFixed(1),        pct: Math.min((stats.adr / 130) * 100, 100), color: "#7c6af7" },
+                { label: "ADR",        val: stats.adr.toFixed(1),        pct: Math.min((stats.adr / 120) * 100, 100), color: "#7c6af7" },
                 { label: "Headshot %", val: stats.hs.toFixed(1) + "%",   pct: Math.min(stats.hs, 100), color: "#ff6b35" },
                 { label: "KAST%",      val: stats.kast.toFixed(1) + "%", pct: Math.min(stats.kast, 100), color: "#00c8ff" },
+                { label: "Opening",    val: stats.opening + "/100",       pct: stats.opening, color: "#ffd700" },
+                { label: "Clutching",  val: stats.clutching + "/100",     pct: stats.clutching, color: "#c084fc" },
+                ...(stats.sniping !== null ? [{ label: "Sniping ★", val: stats.sniping + "/100", pct: stats.sniping, color: "#0aff88" }] : []),
               ].map(({ label, val, pct, color }) => (
                 <div key={label}>
                   <div className="flex items-center justify-between mb-1.5">
