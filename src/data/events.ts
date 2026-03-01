@@ -27,8 +27,8 @@ export const tournaments: Tournament[] = [
     status: "upcoming",
     prize: "",
     teams: 0,
-    date: "4 мар 2026",
-    description: "Текущий турнир W Starladder стартует 4 марта",
+    date: "7 мар 2026",
+    description: "Текущий турнир W Starladder стартует 7 марта",
   },
   {
     id: 2,

@@ -128,4 +128,22 @@ export const teams: Team[] = [
       { name: "Akaki", role: "LURKER", rating: 1.00 },
     ],
   },
+  {
+    rank: 7,
+    name: "Raven Core Unit",
+    tag: "RCU",
+    country: "🇷🇺",
+    points: 1,
+    wins: 0,
+    losses: 0,
+    winrate: 0,
+    change: 0,
+    players: [
+      { name: "isee", role: "IGL", rating: 1.12 },
+      { name: "mythom", role: "RIFLER", rating: 0.95 },
+      { name: "kinesh1", role: "AWP", rating: 1.20 },
+      { name: "Paradoxum0o", role: "RIFLER", rating: 1.04 },
+      { name: "Yurito", role: "RIFLER", rating: 1.01 },
+    ],
+  },
 ];
