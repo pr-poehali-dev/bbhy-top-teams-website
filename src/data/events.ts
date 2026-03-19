@@ -23,12 +23,12 @@ export interface Match {
 export const tournaments: Tournament[] = [
   {
     id: 1,
-    name: "W Starladder",
-    status: "upcoming",
+    name: "W Starladder — Плейофф",
+    status: "live",
     prize: "",
-    teams: 7,
-    date: "7 мар 2026",
-    description: "Текущий турнир W Starladder стартует 7 марта. Зарегистрировано 7 из 16 команд.",
+    teams: 8,
+    date: "19 мар 2026",
+    description: "Плейофф W Starladder стартовал! 8 команд борются за звание чемпиона. Полуфиналы уже определены, следите за матчами в прямом эфире.",
   },
   {
     id: 2,
@@ -36,8 +36,8 @@ export const tournaments: Tournament[] = [
     status: "upcoming",
     prize: "",
     teams: 16,
-    date: "7 мар 2026",
-    description: "Турнир RIEM RIO стартует 7 марта. Все 16 из 16 команд уже зарегистрированы.",
+    date: "5 апр 2026",
+    description: "Турнир RIEM RIO стартует 5 апреля. Все 16 из 16 команд уже зарегистрированы.",
   },
 ];
 
@@ -52,5 +52,34 @@ export const matches: Match[] = [
     time: "19:00",
     status: "finished",
     tournament: "W Cup",
+  },
+  {
+    id: 2,
+    teamA: "Vanity Team",
+    teamB: "Evo Team",
+    date: "20 мар",
+    time: "18:00",
+    status: "upcoming",
+    tournament: "W Starladder Плейофф",
+  },
+  {
+    id: 3,
+    teamA: "MV Team",
+    teamB: "K37",
+    date: "20 мар",
+    time: "20:00",
+    status: "upcoming",
+    tournament: "W Starladder Плейофф",
+  },
+  {
+    id: 4,
+    teamA: "Raven Core Unit",
+    teamB: "Lotus Team",
+    scoreA: 2,
+    scoreB: 0,
+    date: "18 мар",
+    time: "19:00",
+    status: "finished",
+    tournament: "W Starladder Плейофф",
   },
 ];

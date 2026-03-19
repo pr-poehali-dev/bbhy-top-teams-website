@@ -22,14 +22,14 @@ const allPlayers = teams.flatMap(t =>
 // Лучший игрок — топ рейтинг
 const bestPlayer = [...allPlayers].sort((a, b) => b.rating - a.rating)[0];
 
-// Лучший AWP — топ рейтинг среди AWP
+// Лучший AWP — топ рейтинг среди AWP (но rrubbiqq = рекорд 1.42)
 const bestAWP = [...allPlayers]
-  .filter(p => p.role === "AWP")
+  .filter(p => p.role.includes("AWP"))
   .sort((a, b) => b.rating - a.rating)[0];
 
 // Лучший IGL — топ рейтинг среди IGL
 const bestIGL = [...allPlayers]
-  .filter(p => p.role === "IGL")
+  .filter(p => p.role.includes("IGL"))
   .sort((a, b) => b.rating - a.rating)[0];
 
 // Лучший RIFLER
@@ -41,7 +41,7 @@ const bestRifler = [...allPlayers]
 const bestTeam = [...teams].sort((a, b) => b.winrate - a.winrate)[0];
 
 // MVP турнира — фиксировано TheHail
-const mvp = allPlayers.find(p => p.name === "TheHail")!;
+const mvp = allPlayers.find(p => p.name === "TheHail") ?? allPlayers[0];
 
 const AWARDS: {
   id: string;

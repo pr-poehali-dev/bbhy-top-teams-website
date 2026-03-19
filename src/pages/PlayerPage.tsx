@@ -2,17 +2,20 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { teams } from "@/data/teams";
 import Icon from "@/components/ui/icon";
+import AnimatedBackground from "@/components/AnimatedBackground";
 
 const W_CUP_TROPHY = "https://cdn.poehali.dev/projects/7cb67d80-2ffe-43b4-9ac6-5580ad747c34/files/9233dabc-c1b6-424e-90c8-0e2626df8046.jpg";
 const MVP_MEDAL   = "https://cdn.poehali.dev/projects/7cb67d80-2ffe-43b4-9ac6-5580ad747c34/files/2baf38e5-0fb6-4171-94e3-29e66dfeb889.jpg";
 
 const TROPHIES: Record<string, { img: string; label: string }[]> = {
-  rrubbi:    [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
+  rrubbiqq:  [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
   thehail:   [{ img: W_CUP_TROPHY, label: "W Cup 2026" }, { img: MVP_MEDAL, label: "MVP W Cup" }],
   flintyyy:  [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
   orehhh:    [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
-  sains_s:   [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
+  pl3fs:     [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
 };
+
+
 
 function getRatingColor(r: number) {
   if (r >= 1.2) return "#0aff88";
@@ -27,9 +30,9 @@ function getRatingLabel(r: number) {
   return "НИЗКИЙ";
 }
 
-// Firepower: поднят на 15 пунктов для всех
-function getFirepower(r: number): { score: number; grade: string; color: string } {
-  const raw = Math.round(Math.min(r / 2.0, 1) * 100);
+function getFirepower(r: number, name?: string): { score: number; grade: string; color: string } {
+  if (name?.toLowerCase() === "rrubbiqq") return { score: 94, grade: "S+", color: "#0aff88" };
+  const raw = Math.round(Math.min(r / 3.0, 1) * 100);
   const score = Math.min(raw + 15, 100);
   let grade = "C";
   let color = "#ff4466";
@@ -52,25 +55,30 @@ function seededRandom(seed: string, index: number): number {
 }
 
 function deriveStats(name: string, rating: number, role: string) {
-  const isAWP = role === "AWP";
+  const isAWP = role.includes("AWP");
   const sniping = isAWP
-    ? (name.toLowerCase() === "rrubbi" ? 90 : Math.min(Math.round(40 + rating * 28 + seededRandom(name, 9) * 14), 100))
+    ? Math.min(Math.round(40 + rating * 28 + seededRandom(name, 9) * 14), 100)
     : null;
   return {
     rating,
     kd:        parseFloat((rating * 0.96 + seededRandom(name, 1) * 0.08).toFixed(2)),
-    adr:       parseFloat((rating * 74 + seededRandom(name, 2) * 11).toFixed(1)),
-    hs:        parseFloat((26 + rating * 16 + seededRandom(name, 3) * 10).toFixed(1)),
-    kast:      parseFloat((52 + rating * 22 + seededRandom(name, 4) * 6).toFixed(1)),
-    opening:   Math.min(Math.round(28 + rating * 28 + seededRandom(name, 7) * 18), 100),
-    clutching: Math.min(Math.round(18 + rating * 26 + seededRandom(name, 8) * 20), 100),
+    adr:       parseFloat((rating * 68 + seededRandom(name, 2) * 10).toFixed(1)),
+    hs:        parseFloat((22 + rating * 14 + seededRandom(name, 3) * 9).toFixed(1)),
+    kast:      parseFloat((55 + rating * 18 + seededRandom(name, 4) * 6).toFixed(1)),
+    opening:   Math.min(Math.round(25 + rating * 28 + seededRandom(name, 7) * 16), 100),
+    clutching: Math.min(Math.round(15 + rating * 26 + seededRandom(name, 8) * 18), 100),
     sniping,
   };
 }
 
+const FIXED_STATS: Record<string, { rating?: number; kd?: number; adr?: number; hs?: number; kast?: number; opening?: number; clutching?: number; sniping?: number | null }> = {
+  rrubbiqq: { rating: 1.42, kd: 1.52, adr: 110, hs: 51, kast: 90, opening: 94, clutching: 87, sniping: 90 },
+};
+
 const TEAM_MATCHES: Record<string, { won: boolean; opponent: string; scoreA: number; scoreB: number; tournament: string; date: string }[]> = {
   "vanity team":   [{ won: true,  opponent: "XTREME Gaming", scoreA: 3, scoreB: 0, tournament: "W Cup", date: "1 мар 2026" }],
-  "xtreme gaming": [{ won: false, opponent: "Vanity Team",   scoreA: 0, scoreB: 3, tournament: "W Cup", date: "1 мар 2026" }],
+  "k37":           [{ won: false, opponent: "Vanity Team",   scoreA: 0, scoreB: 3, tournament: "W Cup", date: "1 мар 2026" }],
+  "raven core unit": [{ won: true, opponent: "Lotus Team", scoreA: 2, scoreB: 0, tournament: "W Starladder Плейофф", date: "18 мар 2026" }],
 };
 
 export default function PlayerPage() {
@@ -95,21 +103,19 @@ export default function PlayerPage() {
     );
   }
 
-  const stats = deriveStats(player.name, player.rating, player.role);
+  const baseStats = deriveStats(player.name, player.rating, player.role);
+  const overrides = FIXED_STATS[player.name.toLowerCase()] ?? {};
+  const stats = { ...baseStats, ...overrides };
   const teamMatches = TEAM_MATCHES[team.name.toLowerCase()] ?? [];
   const ratingColor = getRatingColor(player.rating);
   const ratingLabel = getRatingLabel(player.rating);
-  const ratingPct = Math.min((player.rating / 2.0) * 100, 100);
-  const fp = getFirepower(player.rating);
+  const ratingPct = Math.min((player.rating / 3.0) * 100, 100);
+  const fp = getFirepower(player.rating, player.name);
   const trophies = TROPHIES[player.name.toLowerCase()] ?? [];
 
   return (
     <div className="min-h-screen bg-[#080A0F] text-white font-ibm overflow-x-hidden">
-      {/* Фон */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,136,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,136,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse,rgba(0,255,136,0.08)_0%,transparent_70%)]" />
-      </div>
+      <AnimatedBackground />
 
       {/* Header */}
       <header className="relative z-10 border-b border-[#0aff88]/10 bg-[#080A0F]/80 backdrop-blur-sm sticky top-0">

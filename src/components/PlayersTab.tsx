@@ -164,10 +164,10 @@ export default function PlayersTab() {
       {/* Список */}
       {view === "list" ? (
         <div>
-          <div className="grid grid-cols-[32px_1fr_100px_80px_80px] gap-4 px-4 py-2 text-[10px] text-[#ffffff30] tracking-[0.2em] uppercase font-oswald mb-1">
+          <div className="grid grid-cols-[32px_1fr_80px_80px] sm:grid-cols-[32px_1fr_120px_80px_80px] gap-2 sm:gap-4 px-4 py-2 text-[10px] text-[#ffffff30] tracking-[0.2em] uppercase font-oswald mb-1">
             <span>#</span>
             <span>Игрок</span>
-            <span>Команда</span>
+            <span className="hidden sm:block">Команда</span>
             <span className="text-right hidden sm:block">Роль</span>
             <span className="text-right">Рейтинг</span>
           </div>
@@ -184,7 +184,7 @@ export default function PlayersTab() {
                 <div
                   key={player.name + player.team}
                   onClick={() => navigate(`/player/${player.teamSlug}/${player.name.toLowerCase()}`)}
-                  className="grid grid-cols-[32px_1fr_100px_80px_80px] gap-4 px-4 py-3 bg-[#ffffff04] border border-transparent hover:bg-[#0aff88]/5 hover:border-[#0aff88]/20 transition-all duration-150 animate-fade-in cursor-pointer group"
+                  className="grid grid-cols-[32px_1fr_80px_80px] sm:grid-cols-[32px_1fr_120px_80px_80px] gap-2 sm:gap-4 px-4 py-3 bg-[#ffffff04] border border-transparent hover:bg-[#0aff88]/5 hover:border-[#0aff88]/20 transition-all duration-150 animate-fade-in cursor-pointer group"
                   style={{ animationDelay: `${i * 15}ms` }}
                 >
                   <div className="flex items-center">
@@ -194,10 +194,13 @@ export default function PlayersTab() {
                     <div className="w-6 h-6 flex items-center justify-center flex-shrink-0 border" style={{ borderColor: color + "40", backgroundColor: color + "15" }}>
                       <span className="text-[8px] font-oswald font-bold" style={{ color }}>{player.name.slice(0, 2).toUpperCase()}</span>
                     </div>
-                    <span className="font-oswald text-sm text-white truncate group-hover:text-[#0aff88] transition-colors">{player.name}</span>
+                    <div className="min-w-0">
+                      <span className="font-oswald text-sm text-white truncate group-hover:text-[#0aff88] transition-colors block">{player.name}</span>
+                      <span className="text-[9px] text-[#ffffff30] font-oswald block sm:hidden">{player.team}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center min-w-0">
-                    <span className="text-[10px] text-[#ffffff50] font-oswald truncate">{player.tag}</span>
+                  <div className="hidden sm:flex items-center min-w-0">
+                    <span className="text-[10px] text-[#ffffff50] font-oswald truncate">{player.team}</span>
                   </div>
                   <div className="hidden sm:flex items-center justify-end">
                     <span className="text-[10px] text-[#ffffff50]">{player.role}</span>
