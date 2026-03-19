@@ -64,7 +64,7 @@ export default function Index() {
 
   if (!activeTab) {
     const topPlayers = teams.flatMap(t => t.players.map(p => ({ ...p, team: t.tag, teamSlug: t.name.toLowerCase().replace(/\s+/g, "-") }))).sort((a, b) => b.rating - a.rating).slice(0, 5);
-    const upcomingMatches = matches.filter(m => m.status === "upcoming").slice(0, 4);
+    const upcomingMatches = matches.filter(m => m.status === "upcoming" || m.status === "live").slice(0, 4);
     const liveTourn = tournaments.find(t => t.status === "live");
 
     return (
@@ -111,7 +111,9 @@ export default function Index() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-0.5">
                           <span className="text-xs text-white truncate">{m.teamA}</span>
-                          {m.status === "upcoming" ? (
+                          {m.status === "live" ? (
+                            <span className="text-[10px] text-red-500 font-bold flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse inline-block" />LIVE</span>
+                          ) : m.status === "upcoming" ? (
                             <span className="text-[10px] text-[#8fa3b8]">vs</span>
                           ) : (
                             <span className="text-[10px] text-[#2b6ea4] font-bold">{m.scoreA}:{m.scoreB}</span>
@@ -141,6 +143,11 @@ export default function Index() {
                   <a href="https://t.me/ENERGYNEWScs2" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[#1e2a3a] transition-colors">
                     <Icon name="Zap" size={12} className="text-[#2b6ea4] flex-shrink-0" />
                     <span className="text-xs text-[#8fa3b8] hover:text-white transition-colors">Energy News</span>
+                    <Icon name="ExternalLink" size={10} className="text-[#8fa3b8]/40 ml-auto" />
+                  </a>
+                  <a href="https://t.me/ForGeCS2" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[#1e2a3a] transition-colors">
+                    <Icon name="Flame" size={12} className="text-[#2b6ea4] flex-shrink-0" />
+                    <span className="text-xs text-[#8fa3b8] hover:text-white transition-colors">ForGe</span>
                     <Icon name="ExternalLink" size={10} className="text-[#8fa3b8]/40 ml-auto" />
                   </a>
                 </div>

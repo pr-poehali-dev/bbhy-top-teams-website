@@ -9,7 +9,7 @@ export default function RankingTab() {
 
   return (
     <div className="bg-[#1a2332] rounded border border-[#2a3441] overflow-hidden animate-fade-in">
-      <div className="grid grid-cols-[40px_1fr_80px_80px_80px_40px] sm:grid-cols-[50px_1fr_90px_90px_100px_40px] gap-2 px-4 py-2.5 text-[10px] text-[#8fa3b8] font-medium border-b border-[#2a3441] bg-[#161d27]">
+      <div className="grid grid-cols-[36px_1fr_70px_40px] sm:grid-cols-[50px_1fr_90px_90px_100px_40px] gap-2 px-4 py-2.5 text-[10px] text-[#8fa3b8] font-medium border-b border-[#2a3441] bg-[#161d27]">
         <span>#</span>
         <span>Команда</span>
         <span className="text-right">Очки</span>
@@ -24,7 +24,7 @@ export default function RankingTab() {
           <div key={team.rank} className="animate-fade-in" style={{ animationDelay: `${i * 30}ms` }}>
             <div
               onClick={() => setExpandedTeam(isExpanded ? null : team.rank)}
-              className={`grid grid-cols-[40px_1fr_80px_80px_80px_40px] sm:grid-cols-[50px_1fr_90px_90px_100px_40px] gap-2 px-4 py-3 cursor-pointer transition-colors border-b border-[#2a3441]/50 group ${
+              className={`grid grid-cols-[36px_1fr_70px_40px] sm:grid-cols-[50px_1fr_90px_90px_100px_40px] gap-2 px-4 py-3 cursor-pointer transition-colors border-b border-[#2a3441]/50 group ${
                 isExpanded ? "bg-[#1e2a3a]" : "hover:bg-[#1e2a3a]"
               }`}
             >
@@ -34,12 +34,14 @@ export default function RankingTab() {
                 </span>
               </div>
               <div className="flex items-center gap-2 min-w-0">
-                <span className="text-sm text-white font-medium truncate">{team.name}</span>
-                {team.change !== 0 && (
-                  <span className={`text-[10px] ${team.change > 0 ? "text-[#66bb6a]" : "text-[#ef5350]"}`}>
-                    {team.change > 0 ? `+${team.change}` : team.change}
-                  </span>
-                )}
+                <div className="min-w-0">
+                  <span className="text-sm text-white font-medium block truncate">{team.name}</span>
+                  {team.change !== 0 && (
+                    <span className={`text-[10px] ${team.change > 0 ? "text-[#66bb6a]" : "text-[#ef5350]"}`}>
+                      {team.change > 0 ? `+${team.change}` : team.change}
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex items-center justify-end">
                 <span className="text-sm font-bold text-white">{team.points}</span>

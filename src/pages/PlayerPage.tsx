@@ -8,11 +8,12 @@ const W_CUP_TROPHY = "https://cdn.poehali.dev/projects/7cb67d80-2ffe-43b4-9ac6-5
 const MVP_MEDAL = "https://cdn.poehali.dev/projects/7cb67d80-2ffe-43b4-9ac6-5580ad747c34/files/2baf38e5-0fb6-4171-94e3-29e66dfeb889.jpg";
 
 const TROPHIES: Record<string, { img: string; label: string }[]> = {
+  rrubbi: [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
   rrubbiqq: [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
   thehail: [{ img: W_CUP_TROPHY, label: "W Cup 2026" }, { img: MVP_MEDAL, label: "MVP W Cup" }],
   flintyyy: [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
   unique: [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
-  pl3fs: [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
+  "sain_s": [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
 };
 
 function getRatingColor(r: number) {
@@ -29,7 +30,7 @@ function getRatingLabel(r: number) {
 }
 
 function getFirepower(r: number, name?: string): { score: number; grade: string; color: string } {
-  if (name?.toLowerCase() === "rrubbiqq") return { score: 94, grade: "S+", color: "#66bb6a" };
+  if (name?.toLowerCase() === "rrubbi" || name?.toLowerCase() === "rrubbiqq") return { score: 94, grade: "S+", color: "#66bb6a" };
   const raw = Math.round(Math.min(r / 3.0, 1) * 100);
   const score = Math.min(raw + 15, 100);
   let grade = "C"; let color = "#ef5350";
@@ -51,29 +52,48 @@ function seededRandom(seed: string, index: number): number {
   return ((h >>> 0) % 1000) / 1000;
 }
 
-function deriveStats(name: string, rating: number, role: string) {
+function deriveStats(name: string, rating: number, role: string, teamData?: { firepower?: number; trading?: number; closing?: number; kd?: number; adr?: number; hs?: number; kast?: number }) {
   const isAWP = role.includes("AWP");
+  const isLurker = role.includes("LURK");
   const sniping = isAWP ? Math.min(Math.round(40 + rating * 28 + seededRandom(name, 9) * 14), 100) : null;
+
+  const closingBase = isLurker
+    ? Math.min(Math.round(72 + rating * 12 + seededRandom(name, 11) * 8), 100)
+    : Math.min(Math.round(50 + rating * 14 + seededRandom(name, 11) * 10), 100);
+
+  const tradingBase = Math.min(Math.round(55 + rating * 16 + seededRandom(name, 12) * 10), 100);
+
   return {
     rating,
-    kd: parseFloat((rating * 0.96 + seededRandom(name, 1) * 0.08).toFixed(2)),
-    adr: parseFloat((rating * 68 + seededRandom(name, 2) * 10).toFixed(1)),
-    hs: parseFloat((22 + rating * 14 + seededRandom(name, 3) * 9).toFixed(1)),
-    kast: parseFloat((55 + rating * 18 + seededRandom(name, 4) * 6).toFixed(1)),
+    kd: teamData?.kd ?? parseFloat((rating * 0.96 + seededRandom(name, 1) * 0.08).toFixed(2)),
+    adr: teamData?.adr ?? parseFloat((rating * 68 + seededRandom(name, 2) * 10).toFixed(1)),
+    hs: teamData?.hs ?? parseFloat((22 + rating * 14 + seededRandom(name, 3) * 9).toFixed(1)),
+    kast: teamData?.kast ?? parseFloat((55 + rating * 18 + seededRandom(name, 4) * 6).toFixed(1)),
     opening: Math.min(Math.round(25 + rating * 28 + seededRandom(name, 7) * 16), 100),
     clutching: Math.min(Math.round(15 + rating * 26 + seededRandom(name, 8) * 18), 100),
     sniping,
+    firepower: teamData?.firepower ?? Math.min(Math.round(55 + rating * 18 + seededRandom(name, 10) * 10), 100),
+    trading: teamData?.trading ?? tradingBase,
+    closing: teamData?.closing ?? closingBase,
   };
 }
 
 const FIXED_STATS: Record<string, { rating?: number; kd?: number; adr?: number; hs?: number; kast?: number; opening?: number; clutching?: number; sniping?: number | null }> = {
-  rrubbiqq: { rating: 1.42, kd: 1.52, adr: 110, hs: 51, kast: 90, opening: 94, clutching: 87, sniping: 90 },
+  rrubbi: { rating: 1.44, kd: 1.51, adr: 112, hs: 51, kast: 91, opening: 94, clutching: 87, sniping: 91 },
+  rrubbiqq: { rating: 1.44, kd: 1.51, adr: 112, hs: 51, kast: 91, opening: 94, clutching: 87, sniping: 91 },
 };
 
 const TEAM_MATCHES: Record<string, { won: boolean; opponent: string; scoreA: number; scoreB: number; tournament: string; date: string }[]> = {
-  "vanity team": [{ won: true, opponent: "XTREME Gaming", scoreA: 3, scoreB: 0, tournament: "W Cup", date: "1 мар 2026" }],
+  "vanity team": [
+    { won: false, opponent: "MV Team", scoreA: 0, scoreB: 2, tournament: "W Starladder Play-Off", date: "18 мар 2026" },
+    { won: true, opponent: "Lotus Team", scoreA: 3, scoreB: 0, tournament: "W Cup", date: "1 мар 2026" },
+  ],
+  "mv team": [
+    { won: true, opponent: "Vanity Team", scoreA: 2, scoreB: 0, tournament: "W Starladder Play-Off", date: "18 мар 2026" },
+  ],
   "k37": [{ won: false, opponent: "Vanity Team", scoreA: 0, scoreB: 3, tournament: "W Cup", date: "1 мар 2026" }],
-  "raven core unit": [{ won: true, opponent: "1337 Team", scoreA: 2, scoreB: 0, tournament: "W Starladder Play-Off", date: "18 мар 2026" }],
+  "raven core unit": [{ won: true, opponent: "1337 Team", scoreA: 2, scoreB: 0, tournament: "W Starladder Play-Off", date: "17 мар 2026" }],
+  "lotus team": [{ won: false, opponent: "Vanity Team", scoreA: 0, scoreB: 3, tournament: "W Cup", date: "1 мар 2026" }],
 };
 
 export default function PlayerPage() {
@@ -98,7 +118,7 @@ export default function PlayerPage() {
     );
   }
 
-  const baseStats = deriveStats(player.name, player.rating, player.role);
+  const baseStats = deriveStats(player.name, player.rating, player.role, player);
   const overrides = FIXED_STATS[player.name.toLowerCase()] ?? {};
   const stats = { ...baseStats, ...overrides };
   const teamMatches = TEAM_MATCHES[team.name.toLowerCase()] ?? [];
@@ -114,6 +134,8 @@ export default function PlayerPage() {
     ["KAST", stats.kast, "#66bb6a"],
     ["Opening", stats.opening, "#81c784"],
     ["Clutch", stats.clutching, "#ce93d8"],
+    ["Trading", stats.trading, "#ff8a65"],
+    ["Closing", stats.closing, "#26c6da"],
   ];
   if (stats.sniping !== null && stats.sniping !== undefined) {
     statBars.push(["AWP", stats.sniping, "#42a5f5"]);
@@ -161,7 +183,7 @@ export default function PlayerPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-[10px] text-[#8fa3b8] mb-0.5">{team.name} · {player.role}</div>
-                  <h1 className="font-bold text-3xl sm:text-4xl text-white truncate">{player.name}</h1>
+                  <h1 className="font-bold text-2xl sm:text-4xl text-white break-all">{player.name}</h1>
                   <div className="mt-2 flex items-center gap-2 flex-wrap">
                     <span className="text-[10px] font-medium px-2 py-0.5 rounded border" style={{ color: ratingColor, borderColor: ratingColor + "40" }}>
                       {ratingLabel}
