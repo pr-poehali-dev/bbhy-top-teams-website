@@ -42,7 +42,7 @@ export const teams: Team[] = [
       { name: "TheHail", role: "AWP", rating: 1.29, firepower: 88, trading: 82, closing: 78, kd: 1.34, adr: 105, hs: 47, kast: 87 },
       { name: "Flintyyy", role: "RIFLER", rating: 1.30, firepower: 91, trading: 85, closing: 76, kd: 1.36, adr: 108, hs: 53, kast: 88 },
       { name: "Unique", role: "RIFLER", rating: 1.16, firepower: 82, trading: 79, closing: 73, kd: 1.21, adr: 98, hs: 48, kast: 84 },
-      { name: "Sain_s", role: "RIFLER", rating: 1.13, firepower: 80, trading: 77, closing: 72, kd: 1.18, adr: 95, hs: 46, kast: 83 },
+      { name: "Sain_s", role: "RIFLER", rating: 1.25, firepower: 87, trading: 83, closing: 77, kd: 1.30, adr: 103, hs: 49, kast: 86 },
     ],
   },
   {
