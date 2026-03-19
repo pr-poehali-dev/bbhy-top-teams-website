@@ -47,7 +47,7 @@ export default function AnimatedBackground() {
 
     const drawGrid = () => {
       const spacing = 60;
-      ctx.strokeStyle = "rgba(10,255,136,0.025)";
+      ctx.strokeStyle = "rgba(43,110,164,0.02)";
       ctx.lineWidth = 0.5;
       for (let x = 0; x < width; x += spacing) {
         ctx.beginPath();
@@ -65,7 +65,7 @@ export default function AnimatedBackground() {
 
     const drawWave = (offset: number, alpha: number, amplitude: number, freq: number) => {
       ctx.beginPath();
-      ctx.strokeStyle = `rgba(10,255,136,${alpha})`;
+      ctx.strokeStyle = `rgba(43,110,164,${alpha})`;
       ctx.lineWidth = 1;
       for (let x = 0; x <= width; x += 4) {
         const y = height * 0.6 + Math.sin((x * freq) + time * 0.5 + offset) * amplitude
@@ -85,7 +85,7 @@ export default function AnimatedBackground() {
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < maxDist) {
             const alpha = (1 - dist / maxDist) * 0.06;
-            ctx.strokeStyle = `rgba(10,255,136,${alpha})`;
+            ctx.strokeStyle = `rgba(43,110,164,${alpha})`;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
@@ -106,7 +106,7 @@ export default function AnimatedBackground() {
       drawWave(4, 0.015, 50, 0.005);
 
       const topGradient = ctx.createRadialGradient(width / 2, 0, 0, width / 2, 0, width * 0.7);
-      topGradient.addColorStop(0, "rgba(10,255,136,0.07)");
+      topGradient.addColorStop(0, "rgba(43,110,164,0.05)");
       topGradient.addColorStop(1, "transparent");
       ctx.fillStyle = topGradient;
       ctx.fillRect(0, 0, width, height * 0.5);
@@ -125,7 +125,7 @@ export default function AnimatedBackground() {
         const pulsed = p.opacity + Math.sin(p.pulse) * 0.12;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(10,255,136,${Math.max(0, Math.min(1, pulsed))})`;
+        ctx.fillStyle = `rgba(43,110,164,${Math.max(0, Math.min(1, pulsed))})`;
         ctx.fill();
       }
 

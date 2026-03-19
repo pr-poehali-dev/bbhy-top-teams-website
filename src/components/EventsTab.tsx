@@ -2,84 +2,99 @@ import { tournaments, matches } from "@/data/events";
 import Icon from "@/components/ui/icon";
 
 export default function EventsTab() {
-  return (
-    <div className="space-y-10 animate-fade-in">
-      {/* Текущие турниры */}
-      <section>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-1 h-6 bg-[#0aff88]" />
-          <h2 className="font-oswald text-xl tracking-widest uppercase text-white">Текущие турниры</h2>
-        </div>
-        <div className="grid gap-3">
-          {tournaments.map((t) => (
-            <div key={t.id} className="border border-[#ffffff10] bg-[#0d1117] p-5 hover:border-[#0aff88]/30 transition-colors">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    {t.status === "live" && (
-                      <span className="flex items-center gap-1 text-[10px] font-oswald tracking-widest uppercase text-[#0aff88] bg-[#0aff88]/10 px-2 py-0.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#0aff88] animate-pulse" />
-                        LIVE
-                      </span>
-                    )}
-                    {t.status === "upcoming" && (
-                      <span className="text-[10px] font-oswald tracking-widest uppercase text-[#ffffff60] border border-[#ffffff20] px-2 py-0.5">
-                        СКОРО
-                      </span>
-                    )}
-                  </div>
-                  <div className="font-oswald text-lg text-white tracking-wide">{t.name}</div>
-                  <div className="text-[#ffffff40] text-xs mt-1">{t.description}</div>
-                </div>
-                <div className="text-right shrink-0">
-                  <div className="font-oswald text-[#0aff88] text-lg">{t.prize}</div>
-                  <div className="text-[#ffffff40] text-xs mt-0.5">{t.teams} команд</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-1 mt-3 text-[#ffffff30] text-xs">
-                <Icon name="Calendar" size={12} />
-                <span>{t.date}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+  const upcoming = matches.filter(m => m.status === "upcoming");
+  const finished = matches.filter(m => m.status === "finished");
 
-      {/* Матчи недели */}
-      <section>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-1 h-6 bg-[#0aff88]" />
-          <h2 className="font-oswald text-xl tracking-widest uppercase text-white">Матчи недели</h2>
+  return (
+    <div className="space-y-5 animate-fade-in">
+      {/* Tournaments */}
+      <div className="bg-[#1a2332] rounded border border-[#2a3441] overflow-hidden">
+        <div className="px-4 py-2.5 border-b border-[#2a3441] bg-[#161d27]">
+          <span className="text-xs font-bold text-white">Турниры</span>
         </div>
-        <div className="grid gap-2">
-          {matches.map((m) => (
-            <div key={m.id} className="border border-[#ffffff10] bg-[#0d1117] px-5 py-4 hover:border-[#0aff88]/20 transition-colors">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <span className="font-oswald text-white text-sm truncate text-right flex-1">{m.teamA}</span>
-                  <div className="shrink-0">
-                    {m.status === "finished" ? (
-                      <span className="font-oswald text-[#0aff88] text-lg tracking-widest">
-                        {m.scoreA} : {m.scoreB}
-                      </span>
-                    ) : m.status === "live" ? (
-                      <span className="font-oswald text-[#ff4444] text-sm tracking-widest animate-pulse">LIVE</span>
-                    ) : (
-                      <span className="font-oswald text-[#ffffff30] text-sm tracking-widest">VS</span>
-                    )}
-                  </div>
-                  <span className="font-oswald text-white text-sm truncate flex-1">{m.teamB}</span>
+        {tournaments.map((t) => (
+          <div key={t.id} className="px-4 py-3 border-b border-[#2a3441]/50 last:border-b-0 hover:bg-[#1e2a3a] transition-colors">
+            <div className="flex items-center gap-3 mb-1">
+              {t.status === "live" && (
+                <span className="flex items-center gap-1 text-[10px] font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                  LIVE
+                </span>
+              )}
+              {t.status === "upcoming" && (
+                <span className="text-[10px] font-medium text-[#8fa3b8] bg-[#2a3441] px-2 py-0.5 rounded">Upcoming</span>
+              )}
+              <span className="text-sm font-medium text-white">{t.name}</span>
+            </div>
+            <div className="text-xs text-[#8fa3b8] mb-1">{t.description}</div>
+            <div className="flex items-center gap-3 text-[10px] text-[#8fa3b8]/60">
+              <span className="flex items-center gap-1"><Icon name="Calendar" size={10} />{t.date}</span>
+              <span className="flex items-center gap-1"><Icon name="Users" size={10} />{t.teams} teams</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Upcoming Matches */}
+      {upcoming.length > 0 && (
+        <div className="bg-[#1a2332] rounded border border-[#2a3441] overflow-hidden">
+          <div className="px-4 py-2.5 border-b border-[#2a3441] bg-[#161d27]">
+            <span className="text-xs font-bold text-white">Предстоящие матчи</span>
+          </div>
+          {upcoming.map((m) => (
+            <div key={m.id} className="px-4 py-3 border-b border-[#2a3441]/50 last:border-b-0 hover:bg-[#1e2a3a] transition-colors">
+              <div className="flex items-center">
+                <div className="flex-1 text-right">
+                  <span className="text-sm text-white font-medium">{m.teamA}</span>
                 </div>
-                <div className="text-right shrink-0">
-                  <div className="text-[#ffffff40] text-xs">{m.date}</div>
-                  <div className="text-[#ffffff25] text-[10px]">{m.time}</div>
+                <div className="w-20 text-center">
+                  <span className="text-xs text-[#8fa3b8] font-medium">vs</span>
+                </div>
+                <div className="flex-1">
+                  <span className="text-sm text-white font-medium">{m.teamB}</span>
+                </div>
+                <div className="text-right ml-3 flex-shrink-0">
+                  <div className="text-xs text-[#8fa3b8]">{m.date}</div>
+                  <div className="text-[10px] text-[#8fa3b8]/50">{m.time}</div>
                 </div>
               </div>
-              <div className="text-[#ffffff25] text-[10px] mt-1.5 font-oswald tracking-wider">{m.tournament}</div>
+              <div className="text-[10px] text-[#2b6ea4] mt-1">{m.tournament}</div>
             </div>
           ))}
         </div>
-      </section>
+      )}
+
+      {/* Results */}
+      {finished.length > 0 && (
+        <div className="bg-[#1a2332] rounded border border-[#2a3441] overflow-hidden">
+          <div className="px-4 py-2.5 border-b border-[#2a3441] bg-[#161d27]">
+            <span className="text-xs font-bold text-white">Результаты</span>
+          </div>
+          {finished.map((m) => (
+            <div key={m.id} className="px-4 py-3 border-b border-[#2a3441]/50 last:border-b-0 hover:bg-[#1e2a3a] transition-colors">
+              <div className="flex items-center">
+                <div className="flex-1 text-right">
+                  <span className={`text-sm font-medium ${(m.scoreA ?? 0) > (m.scoreB ?? 0) ? "text-[#66bb6a]" : "text-[#8fa3b8]"}`}>
+                    {m.teamA}
+                  </span>
+                </div>
+                <div className="w-20 text-center">
+                  <span className="text-sm font-bold text-white">{m.scoreA} : {m.scoreB}</span>
+                </div>
+                <div className="flex-1">
+                  <span className={`text-sm font-medium ${(m.scoreB ?? 0) > (m.scoreA ?? 0) ? "text-[#66bb6a]" : "text-[#8fa3b8]"}`}>
+                    {m.teamB}
+                  </span>
+                </div>
+                <div className="text-right ml-3 flex-shrink-0">
+                  <div className="text-xs text-[#8fa3b8]">{m.date}</div>
+                </div>
+              </div>
+              <div className="text-[10px] text-[#2b6ea4] mt-1">{m.tournament}</div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
