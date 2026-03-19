@@ -12,8 +12,8 @@ const TROPHIES: Record<string, { img: string; label: string }[]> = {
   rrubbiqq: [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
   thehail: [{ img: W_CUP_TROPHY, label: "W Cup 2026" }, { img: MVP_MEDAL, label: "MVP W Cup" }],
   flintyyy: [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
-  unique: [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
   "sain_s": [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
+  oooreh: [{ img: W_CUP_TROPHY, label: "W Cup 2026" }],
 };
 
 function getRatingColor(r: number) {
@@ -79,8 +79,8 @@ function deriveStats(name: string, rating: number, role: string, teamData?: { fi
 }
 
 const FIXED_STATS: Record<string, { rating?: number; kd?: number; adr?: number; hs?: number; kast?: number; opening?: number; clutching?: number; sniping?: number | null }> = {
-  rrubbi: { rating: 1.44, kd: 1.51, adr: 112, hs: 51, kast: 91, opening: 94, clutching: 87, sniping: 91 },
-  rrubbiqq: { rating: 1.44, kd: 1.51, adr: 112, hs: 51, kast: 91, opening: 94, clutching: 87, sniping: 91 },
+  rrubbi: { rating: 1.32, kd: 1.38, adr: 107, hs: 50, kast: 90, opening: 90, clutching: 85, sniping: 88 },
+  rrubbiqq: { rating: 1.32, kd: 1.38, adr: 107, hs: 50, kast: 90, opening: 90, clutching: 85, sniping: 88 },
 };
 
 const TEAM_MATCHES: Record<string, { won: boolean; opponent: string; scoreA: number; scoreB: number; tournament: string; date: string }[]> = {
